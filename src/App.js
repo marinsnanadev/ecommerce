@@ -1,20 +1,21 @@
 import './App.css';
 import React, { useState } from 'react';
 import splashImage from './assets/images/splash.jpg';
-import puppyCorset from './assets/clothing/corset/puppy-corset.jpg';
-import midiDress from './assets/clothing/dresses/midi-dress.jpg';
-import dollBag from './assets/clothing/bags/doll-bag.jpg';
+import redSuit from './assets/clothing/suits/red-suit (1).jpg';
+import brownSkirt from './assets/clothing/skirts/brown-skirt (2).jpg';
+import greenPurse from './assets/clothing/purses/green-purse.jpg';
+
 
 const collections = [
-  { title: 'Corsets', blurb: 'Architectural lines with a rebellious soul.', image: puppyCorset, accent: 'violet' },
-  { title: 'Dresses', blurb: 'Fluid structure for evening glamour.', image: midiDress, accent: 'lavender' },
-  { title: 'Purses', blurb: 'Statement accessories with a cinematic finish.', image: dollBag, accent: 'ink' },
+  { title: 'Suits', blurb: 'Architectural lines with a rebellious soul.', image: redSuit, accent: 'violet' },
+  { title: 'Skirts', blurb: 'Fluid structure for evening glamour.', image: brownSkirt, accent: 'lavender' },
+  { title: 'Purses', blurb: 'Statement accessories with a cinematic finish.', image: greenPurse, accent: 'ink' },
 ];
 
 const featuredProducts = [
-  { name: 'Puppy corset', price: '$180', category: 'Corsets', image: puppyCorset },
-  { name: 'Midi Dress', price: '$120', category: 'Dresses', image: midiDress },
-  { name: 'Doll bag', price: '$95', category: 'Purses', image: dollBag },
+  { name: 'Suit', price: '$180', category: 'Suits', image: redSuit },
+  { name: 'Skirt', price: '$120', category: 'Skirts', image: brownSkirt },
+  { name: 'bag', price: '$95', category: 'Purses', image: greenPurse },
 ];
 
 function App() {
@@ -56,10 +57,10 @@ function App() {
 
         <div className="hero-visual">
           <div className="spotlight-card spotlight-main">
-            <img src={puppyCorset} alt="Editorial corset look" />
+            <img src={redSuit} alt="Editorial suit look" />
           </div>
           <div className="spotlight-card spotlight-side">
-            <img src={midiDress} alt="Editorial dress look" />
+            <img src={brownSkirt} alt="Editorial skirt look" />
           </div>
         </div>
       </header>
@@ -88,7 +89,7 @@ function App() {
         <section className="featured-section" id="story">
           <div className="editorial-panel">
             <div className="editorial-image">
-              <img src={dollBag} alt="Statement bag and accessories" />
+              <img src={greenPurse} alt="Statement bag and accessories" />
             </div>
             <div className="editorial-copy">
               <p className="eyebrow">Why VIOLET</p>
