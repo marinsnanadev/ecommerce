@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+
+function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBackToHome, onAddToCart }) {
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('featured');
+
+  const baseItems = category?.products ?? [];
+  const filteredItems = baseItems.filter((item) => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'new') return item.isNew;
+    if (activeFilter === 'featured') return item.isFeatured;
+    return true;
+  });
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (sortBy === 'price-low') {
+      return Number(a.price.replace('$', '')) - Number(b.price.replace('$', ''));
+    }
+    if (sortBy === 'price-high') {
+      return Number(b.price.replace('$', '')) - Number(a.price.replace('$', ''));
+    }
+    return Number(b.isFeatured) - Number(a.isFeatured) || Number(b.isNew) - Number(a.isNew);
+  });
+
+  return (
+    <div className="app-shell">
+      <div className="ambient ambient-one" />
+      <div className="ambient ambient-two" />
+
+      <nav className="site-nav">
+        <div className="nav-actions">
+          <button type="button" className="nav-back-btn" onClick={onBackToShop}>
+            ← Back to shop
+          </button>
+          <button type="button" className="nav-back-btn" onClick={onBackToHome}>
+            Home
+          </button>
+        </div>
+        <span className="nav-mark">VIOLET</span>
+        <div style={{ position: 'relative' }}>
+          <button type="button" className="nav-bag" aria-label="View bag" onClick={onOpenCart}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M6 8h12l-1 12H7L6 8Z" />
+              <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+            </svg>
+          </button>
+          {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
+        </div>
+      </nav>
+
+      <main className="category-page">
+        <section className="category-hero">
+          <div className="category-hero-copy">
+            <p className="eyebrow">Category edit</p>
+            <h1>{category?.name ?? 'Collection'}</h1>
+            <p>{category?.description ?? 'Browse the latest pieces in this edit.'}</p>
+          </div>
+        </section>
+
+        <section className="category-toolbar">
+          <div className="filter-pills">
+            {['all', 'new', 'featured'].map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                className={`filter-pill ${activeFilter === filter ? 'is-active' : ''}`}
+                onClick={() => setActiveFilter(filter)}
+              >
+                {filter === 'all' ? 'All' : filter === 'new' ? 'New' : 'Featured'}
+              </button>
+            ))}
+          </div>
+
+          <label className="sort-control">
+            <span>Sort price</span>
+            <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+              <option value="price-low">Low to High</option>
+              <option value="price-high">High to Low</option>
+            </select>
+          </label>
+        </section>
+
+        <section className="category-grid">
+          {sortedItems.map((item) => (
+            <article key={item.name} className="category-product-card">
+              <div className="category-product-image">
+                {item.image ? (
+                  <img src={item.image} alt={item.name} />
+                ) : (
+                  <div className="category-placeholder">
+                    <span>Photo placeholder</span>
+                  </div>
+                )}
+              </div>
+              <div className="category-product-content">
+                <p className="shop-card-accent">{item.tag}</p>
+                <h3>{item.name}</h3>
+                <p>{item.blurb}</p>
+                <div className="category-product-meta">
+                  <span>{item.price}</span>
+                  <button type="button" className="purchase-btn" onClick={() => onAddToCart({ ...item, category: category?.name ?? 'Collection' })}>
+                    Add to bag
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+      </main>
+    </div>
+  );
+}
+
+export default CategoryPage;
