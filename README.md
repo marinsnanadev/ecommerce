@@ -1,70 +1,129 @@
-# Getting Started with Create React App
+# VIOLET — E-commerce Full Stack
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Loja virtual de moda com front-end em React e back-end em Python (FastAPI), com persistência de dados em banco SQL e carrinho de compras funcional.
 
-## Available Scripts
+![status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![react](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![fastapi](https://img.shields.io/badge/FastAPI-005571?logo=fastapi)
+![sqlite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📸 Preview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Home
+![Home](docs/gifs/homepage.gif)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ✨ Sobre o projeto
 
-### `npm run build`
+VIOLET é uma loja de roupas e acessórios construída inicialmente como projeto front-end, e evoluída para uma aplicação full stack completa. O objetivo foi sair de dados fictícios (hardcoded) para uma arquitetura real, com:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- API REST própria, construída em Python
+- Banco de dados relacional persistindo produtos, categorias e carrinho
+- Front-end em React consumindo os dados dinamicamente
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🧱 Tech Stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Front-end**
+- React
+- CSS customizado (animações, scroll reveal, design responsivo)
 
-### `npm run eject`
+**Back-end**
+- Python 3
+- FastAPI
+- SQLAlchemy (ORM)
+- SQLite (banco de dados)
+- Uvicorn (servidor ASGI)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🚀 Funcionalidades
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- [x] Listagem de categorias vinda do banco de dados
+- [x] Listagem de produtos por categoria, com filtros (Novo / Destaque) e ordenação por preço
+- [x] Carrinho de compras persistente (sobrevive a refresh da página), vinculado a uma sessão de visitante
+- [x] Adicionar, atualizar quantidade e remover itens do carrinho via API
+- [x] Documentação interativa da API gerada automaticamente (Swagger)
+- [ ] Autenticação de usuário
+- [ ] Checkout funcional
+- [ ] Painel administrativo para cadastro de produtos
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🔌 Endpoints da API
 
-## Learn More
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/categories` | Lista todas as categorias |
+| GET | `/products` | Lista todos os produtos |
+| GET | `/products/category/{category_name}` | Lista produtos de uma categoria específica |
+| GET | `/cart/{session_id}` | Retorna os itens do carrinho de uma sessão |
+| POST | `/cart/{session_id}/add` | Adiciona um produto ao carrinho |
+| PUT | `/cart/{session_id}/item/{item_id}` | Atualiza a quantidade de um item |
+| DELETE | `/cart/{session_id}/item/{item_id}` | Remove um item do carrinho |
+| DELETE | `/cart/{session_id}` | Limpa o carrinho inteiro |
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Documentação interativa disponível em `/docs` quando o servidor está rodando.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## ⚙️ Como rodar o projeto localmente
 
-### Code Splitting
+### Pré-requisitos
+- [Node.js](https://nodejs.org/) instalado
+- [Python 3.10+](https://www.python.org/downloads/) instalado
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 1. Clone o repositório
 
-### Analyzing the Bundle Size
+```bash
+git clone https://github.com/marinsnanadev/ecommerce.git
+cd ecommerce
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 2. Rodando o back-end
 
-### Making a Progressive Web App
+```bash
+cd backend
+python -m venv venv
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# Ativar o ambiente virtual
+# Windows:
+venv\Scripts\Activate.ps1
+# Mac/Linux:
+source venv/bin/activate
 
-### Advanced Configuration
+pip install -r requirements.txt
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Popular o banco de dados com os dados iniciais
+python -m app.seed
 
-### Deployment
+# Iniciar o servidor
+uvicorn app.main:app --reload
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+O back-end estará disponível em `http://127.0.0.1:8000`.
 
-### `npm run build` fails to minify
+### 3. Rodando o front-end
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Em outro terminal, na raiz do projeto:
+
+```bash
+npm install
+npm start
+```
+
+O front-end estará disponível em `http://localhost:3000`.
+
+> ⚠️ Os dois servidores (back-end e front-end) precisam estar rodando simultaneamente para a aplicação funcionar completamente.
+
+## 🗺️ Roadmap / Próximos passos
+
+- Testes automatizados com `pytest` nos principais endpoints
+- Deploy do back-end (Render/Railway) e front-end (Vercel/Netlify)
+- Sistema de autenticação de usuários
+- Painel administrativo para gestão de produtos
+
+## 👩‍💻 Autora
+
+Desenvolvido por **Nana** — Estudante de Engenharia de Software, com experiência prévia como desenvolvedora full stack.
+
+[GitHub](https://github.com/marinsnanadev)

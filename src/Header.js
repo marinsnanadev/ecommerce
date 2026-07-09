@@ -1,4 +1,5 @@
 import React from 'react';
+import './Header.css';
 
 function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit }) {
   return (

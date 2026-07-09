@@ -1,0 +1,352 @@
+.collections-section,
+.featured-section {
+  position: relative;
+  z-index: 1;
+  padding: 1rem 3rem 3.5rem;
+}
+
+.section-heading h2 {
+  margin: 0 0 0.35rem;
+  font-size: 2rem;
+  color: var(--ink);
+}
+
+.section-heading p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.collection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(81, 59, 156, 0.14);
+}
+
+.collection-nav-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.collection-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid rgba(81, 59, 156, 0.2);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--accent);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+@media (min-width: 1025px) {
+  .collection-nav-buttons {
+    display: none;
+  }
+}
+
+.collection-next-btn:hover {
+  transform: translateX(3px);
+  box-shadow: 0 10px 24px rgba(81, 59, 156, 0.12);
+}
+
+.collection-prev-btn:hover {
+  transform: translateX(-3px);
+  box-shadow: 0 10px 24px rgba(81, 59, 156, 0.12);
+}
+
+.collection-nav-btn span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.collection-grid {
+  overflow: hidden;
+  padding: 1rem 0 0.2rem;
+}
+
+.collection-track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.collection-slide {
+  display: flex;
+  flex: 0 0 100%;
+  gap: 1.25rem;
+  min-width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .collection-slide {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+
+  .collection-card {
+    flex: 0 0 calc(25% - 0.94rem);
+    width: calc(25% - 0.94rem);
+    max-width: calc(25% - 0.94rem);
+    min-height: 320px;
+  }
+}
+
+.collection-card {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 420px;
+  cursor: pointer;
+  background: transparent;
+  border-radius: 0;
+  padding: 1.4rem;
+  border-right: 1px solid rgba(81, 59, 156, 0.14);
+  box-shadow: none;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.45s ease;
+}
+
+.collection-card:last-child {
+  border-right: none;
+}
+
+.collection-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 24px 44px rgba(81, 59, 156, 0.2);
+}
+
+.collection-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 6px;
+}
+
+.collection-index {
+  position: absolute;
+  top: 1.6rem;
+  left: 1.6rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 18px rgba(81, 59, 156, 0.22);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.collection-card:hover .collection-index {
+  transform: scale(1.18) rotate(-10deg);
+}
+
+.card-image {
+  height: 260px;
+  margin-bottom: 1.1rem;
+}
+
+.collection-card:hover img {
+  transform: scale(1.1) rotate(-1.5deg);
+}
+
+.collection-card h3 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.25rem;
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.collection-card h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.collection-card:hover h3::after {
+  width: 100%;
+}
+
+.collection-card p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.card-content {
+  padding: 0;
+}
+
+/* ===== Featured / story ===== */
+
+.featured-section {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.editorial-panel {
+  border-radius: 24px;
+  padding: 0;
+  border: none;
+}
+
+.editorial-panel:hover img {
+  transform: scale(1.08);
+}
+
+.editorial-image {
+  margin-bottom: 1rem;
+  height: 320px;
+}
+
+.editorial-copy h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 2.1rem;
+  line-height: 1.3;
+  margin: 0 0 0.35rem;
+  color: var(--ink);
+}
+
+.editorial-copy p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.product-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgba(81, 59, 156, 0.14);
+}
+
+.product-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 1.1rem;
+  align-items: center;
+  padding: 1.3rem 0;
+  border-bottom: 1px solid rgba(81, 59, 156, 0.14);
+  border-radius: 0;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.product-card:hover {
+  transform: translateX(12px);
+}
+
+.product-card:hover img {
+  transform: scale(1.08);
+}
+
+.product-image {
+  width: 96px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.product-index {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.6rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  box-shadow: 0 6px 14px rgba(81, 59, 156, 0.2);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.product-card:hover .product-index {
+  transform: scale(1.18) rotate(10deg);
+}
+
+.product-meta h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.product-meta p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.product-meta span {
+  display: inline-block;
+  margin-bottom: 0.3rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.product-price {
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .featured-section {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-card {
+    border-right: none;
+    border-bottom: 1px solid rgba(81, 59, 156, 0.14);
+  }
+
+  .collection-card:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .collections-section,
+  .featured-section {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+
+  .product-card {
+    grid-template-columns: 1fr;
+  }
+
+  .product-index {
+    top: 0.6rem;
+    left: 0.6rem;
+  }
+}

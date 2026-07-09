@@ -1,14 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { imageMap } from './imageMap';
+import './CategoryPage.css';
+
 
 function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBackToHome, onAddToCart }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const baseItems = category?.products ?? [];
-  const filteredItems = baseItems.filter((item) => {
+  // Fetch products for the selected category when the component mounts or when the category changes
+
+  useEffect(() => {
+    if (!category?.name) return;
+
+    setLoading(true);
+    fetch(`http://127.0.0.1:8000/products/category/${category.name}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Error fetching products');
+        return res.json();
+      })
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [category?.name]);
+
+  const filteredItems = products.filter((item) => {
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'new') return item.isNew;
-    if (activeFilter === 'featured') return item.isFeatured;
+    if (activeFilter === 'new') return item.is_new;
+    if (activeFilter === 'featured') return item.is_featured;
     return true;
   });
 
@@ -19,7 +45,7 @@ function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBa
     if (sortBy === 'price-high') {
       return Number(b.price.replace('$', '')) - Number(a.price.replace('$', ''));
     }
-    return Number(b.isFeatured) - Number(a.isFeatured) || Number(b.isNew) - Number(a.isNew);
+    return Number(b.is_featured) - Number(a.is_featured) || Number(b.is_new) - Number(a.is_new);
   });
 
   return (
@@ -80,32 +106,41 @@ function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBa
           </label>
         </section>
 
-        <section className="category-grid">
-          {sortedItems.map((item) => (
-            <article key={item.name} className="category-product-card">
-              <div className="category-product-image">
-                {item.image ? (
-                  <img src={item.image} alt={item.name} />
-                ) : (
-                  <div className="category-placeholder">
-                    <span>Photo placeholder</span>
-                  </div>
-                )}
-              </div>
-              <div className="category-product-content">
-                <p className="shop-card-accent">{item.tag}</p>
-                <h3>{item.name}</h3>
-                <p>{item.blurb}</p>
-                <div className="category-product-meta">
-                  <span>{item.price}</span>
-                  <button type="button" className="purchase-btn" onClick={() => onAddToCart({ ...item, category: category?.name ?? 'Collection' })}>
-                    Add to bag
-                  </button>
+        {loading && <p className="shop-loading">Loading products...</p>}
+        {error && <p className="shop-error">Error: {error}</p>}
+
+        {!loading && !error && (
+          <section className="category-grid">
+            {sortedItems.map((item) => (
+              <article key={item.id} className="category-product-card">
+                <div className="category-product-image">
+                  {item.image ? (
+                    <img src={imageMap[item.image]} alt={item.name} />
+                  ) : (
+                    <div className="category-placeholder">
+                      <span>Photo placeholder</span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </article>
-          ))}
-        </section>
+                <div className="category-product-content">
+                  <p className="shop-card-accent">{item.tag}</p>
+                  <h3>{item.name}</h3>
+                  <p>{item.blurb}</p>
+                  <div className="category-product-meta">
+                    <span>{item.price}</span>
+                    <button
+                      type="button"
+                      className="purchase-btn"
+                      onClick={() => onAddToCart({ ...item, image: imageMap[item.image], category: category?.name ?? 'Collection' })}
+                    >
+                      Add to bag
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
       </main>
     </div>
   );
