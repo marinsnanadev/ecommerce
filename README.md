@@ -102,6 +102,14 @@ uvicorn app.main:app --reload
 
 O back-end estará disponível em `http://127.0.0.1:8000`.
 
+#### Rodando os testes do back-end
+
+```bash
+cd backend
+pip install -r requirements.txt  # já inclui pytest e httpx
+pytest
+```
+
 ### 3. Rodando o front-end
 
 Em outro terminal, na raiz do projeto:
@@ -119,10 +127,9 @@ O front-end estará disponível em `http://localhost:3000` e já aponta por padr
 
 ## 🗺️ Roadmap / Próximos passos
 
-- Testes automatizados com `pytest` nos principais endpoints
-- Deploy do back-end (Render/Railway) e front-end (Vercel/Netlify)
 - Sistema de autenticação de usuários
 - Painel administrativo para gestão de produtos
+- Deploy do back-end (Render/Railway) e front-end (Vercel/Netlify)
 
 ## 👩‍💻 Autora
 
