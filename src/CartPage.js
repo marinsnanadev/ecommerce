@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Footer from './Footer';
+import './CartPage.css';
 
-function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQuantity, onBackToHome, onClearCart }) {
+function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQuantity, onBackToHome, onClearCart, onGoToCheckout }) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const total = items.reduce(
     (sum, item) => sum + parseInt(item.price.replace('$', ''), 10) * item.quantity,
@@ -41,8 +42,8 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
         ) : (
           <>
             <div className="cart-items">
-              {items.map((item, idx) => (
-                <div key={`${item.name}-${idx}`} className="cart-item">
+              {items.map((item) => (
+                <div key={item.item_id} className="cart-item">
                   <img src={item.image} alt={item.name} className="cart-item-image" />
                   <div className="cart-item-details">
                     <h3>{item.name}</h3>
@@ -50,23 +51,23 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
                     <p className="cart-item-price">{item.price}</p>
                   </div>
                   <div className="cart-item-controls">
-                    <button type="button" onClick={() => onUpdateQuantity(idx, Math.max(1, item.quantity - 1))}>
+                    <button type="button" onClick={() => onUpdateQuantity(item.item_id, Math.max(1, item.quantity - 1))}>
                       −
                     </button>
                     <input
                       type="number"
                       value={item.quantity}
-                      onChange={(e) => onUpdateQuantity(idx, Math.max(1, parseInt(e.target.value, 10) || 1))}
+                      onChange={(e) => onUpdateQuantity(item.item_id, Math.max(1, parseInt(e.target.value, 10) || 1))}
                       min="1"
                     />
-                    <button type="button" onClick={() => onUpdateQuantity(idx, item.quantity + 1)}>
+                    <button type="button" onClick={() => onUpdateQuantity(item.item_id, item.quantity + 1)}>
                       +
                     </button>
                   </div>
                   <p className="cart-item-subtotal">
                     ${(parseInt(item.price.replace('$', ''), 10) * item.quantity).toLocaleString()}
                   </p>
-                  <button type="button" className="remove-btn" onClick={() => onRemoveItem(idx)}>
+                  <button type="button" className="remove-btn" style={{margin: '0.5rem 0'}} onClick={() => onRemoveItem(item.item_id)}>
                     Remove
                   </button>
                 </div>
@@ -77,11 +78,15 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
                 <span>Total:</span>
                 <span className="total-price">${total.toLocaleString()}</span>
               </div>
-              <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <button type="button" className="remove-btn" onClick={() => setShowClearConfirm(true)}>
+              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  className="remove-btn"
+                  onClick={() => setShowClearConfirm(true)}
+                >
                   Remove all
                 </button>
-                <button type="button" className="checkout-btn">
+                <button type="button" className="checkout-btn" onClick={onGoToCheckout}>
                   Proceed to Checkout
                 </button>
               </div>
@@ -99,7 +104,11 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
               <button type="button" className="checkout-btn" onClick={() => setShowClearConfirm(false)}>
                 Cancel
               </button>
-              <button type="button" className="remove-btn" onClick={() => { onClearCart(); setShowClearConfirm(false); }}>
+              <button
+                type="button"
+                className="remove-btn"
+                onClick={() => { onClearCart(); setShowClearConfirm(false); }}
+              >
                 Yes, remove all
               </button>
             </div>

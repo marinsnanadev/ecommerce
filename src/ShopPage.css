@@ -1,0 +1,102 @@
+.shop-page {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem 3rem 4rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.shop-hero {
+  margin-bottom: 2rem;
+  max-width: 760px;
+}
+
+.shop-hero h1 {
+  margin: 0.4rem 0 0.8rem;
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  color: var(--ink);
+}
+
+.shop-hero p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.4rem;
+}
+
+.shop-card {
+  position: relative;
+  background: transparent;
+  padding: 1.6rem;
+  border-right: 1px solid rgba(81, 59, 156, 0.14);
+  box-shadow: none;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.45s ease;
+  overflow: hidden;
+}
+
+.shop-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 24px 44px rgba(81, 59, 156, 0.2);
+}
+
+.shop-card-image {
+  height: 300px;
+  background: #f4ebff;
+  border-radius: 0.6rem;
+}
+
+.shop-card-image img {
+  border-radius: 0.6rem;
+}
+
+.shop-card:hover .shop-card-image img {
+  transform: scale(1.1) rotate(-1.5deg);
+}
+
+.shop-card-content {
+  padding: 1.2rem 1.25rem 1.4rem;
+}
+
+.shop-card-accent {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.shop-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.shop-card p {
+  margin: 0 0 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.shop-card-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.shop-card-link:hover {
+  text-decoration: underline;
+}

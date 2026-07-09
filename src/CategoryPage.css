@@ -1,0 +1,134 @@
+.category-page {
+  position: relative;
+  z-index: 1;
+  padding: 2.2rem 3rem 4rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.category-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.6rem;
+  align-items: center;
+  margin-bottom: 1.6rem;
+}
+
+.category-hero-copy h1 {
+  margin: 0.4rem 0 0.8rem;
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  color: var(--ink);
+}
+
+.category-hero-copy p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.category-hero-card,
+.category-product-image {
+  background: #f4ebff;
+  height: 500px;
+}
+
+.category-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8rem;
+}
+
+.category-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.filter-pill {
+  border: 1px solid rgba(81, 59, 156, 0.16);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ink);
+  padding: 0.6rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.filter-pill.is-active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sort-control select {
+  border: 1px solid rgba(81, 59, 156, 0.16);
+  border-radius: 999px;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+}
+
+.sort-control select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(81, 59, 156, 0.2);
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.4rem;
+}
+
+.category-product-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(81, 59, 156, 0.14);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(17, 17, 17, 0.08);
+}
+
+.category-product-content {
+  padding: 1.2rem 1.25rem 1.4rem;
+}
+
+.category-product-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.category-product-meta span {
+  font-weight: 700;
+  color: var(--ink);
+}
