@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import Footer from './Footer';
+import { formatPrice } from './formatPrice';
 import './CheckoutPage.css';
 import creditCardImage from './assets/images/credit-card.png';
 import paypalImage from './assets/images/paypal.png';
@@ -13,10 +14,6 @@ const PAYMENT_METHODS = [
 
 const SHIPPING_COST = 12;
 const TAX_RATE = 0.08;
-
-function parsePrice(price) {
-    return Number(String(price).replace(/[^0-9.-]+/g, '')) || 0;
-}
 
 function FormField({ id, label, ...inputProps }) {
     return (
@@ -75,7 +72,7 @@ function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder }) {
                             <p className="checkout-item-name">{item.name}</p>
                             <p className="checkout-item-meta">Qty {item.quantity} · {item.category}</p>
                         </div>
-                        <span className="checkout-item-price">{item.price}</span>
+                        <span className="checkout-item-price">{formatPrice(item.price)}</span>
                     </div>
                 ))}
             </div>
@@ -83,19 +80,19 @@ function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder }) {
             <div className="checkout-breakdown">
                 <div className="summary-row">
                     <span>Subtotal</span>
-                    <span>${subtotal.toLocaleString()}</span>
+                    <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="summary-row">
                     <span>Taxes</span>
-                    <span>${tax.toLocaleString()}</span>
+                    <span>{formatPrice(tax)}</span>
                 </div>
                 <div className="summary-row">
                     <span>Shipping</span>
-                    <span>${shipping.toLocaleString()}</span>
+                    <span>{formatPrice(shipping)}</span>
                 </div>
                 <div className="summary-row total-row">
                     <span>Total</span>
-                    <span>${total.toLocaleString()}</span>
+                    <span>{formatPrice(total)}</span>
                 </div>
             </div>
 
@@ -110,7 +107,7 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder }) {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHODS[0].id);
 
     const subtotal = useMemo(
-        () => items.reduce((sum, item) => sum + parsePrice(item.price) * item.quantity, 0),
+        () => items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0),
         [items]
     );
     const tax = Math.round(subtotal * TAX_RATE);

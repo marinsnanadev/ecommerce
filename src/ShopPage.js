@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { imageMap } from './imageMap';
+import { API_BASE } from './apiConfig';
 import './ShopPage.css';
 
 function Reveal({ children, className = '', as: Tag = 'div', ...rest }) {
@@ -37,7 +38,7 @@ function ShopPage({ onBackToHome, onSelectCategory, cartItemsCount = 0, onOpenCa
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/categories')
+    fetch(`${API_BASE}/categories`)
       .then((res) => {
         if (!res.ok) throw new Error('Error fetching categories');
         return res.json();

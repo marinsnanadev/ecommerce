@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -20,7 +20,7 @@ class Product(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String)
     tag = Column(String)
-    price = Column(String)
+    price = Column(Float)
     blurb = Column(String)
     image = Column(String)
     is_new = Column(Boolean, default=False)

@@ -1,4 +1,4 @@
-const API_BASE = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
+import { API_BASE } from './apiConfig';
 
 export async function fetchCart(sessionId) {
   const res = await fetch(`${API_BASE}/cart/${sessionId}`);

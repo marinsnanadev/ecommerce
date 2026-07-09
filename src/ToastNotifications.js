@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatPrice } from './formatPrice';
 
 function ToastNotifications({ toasts }) {
   return toasts.map((toast, index) => (
@@ -7,7 +8,7 @@ function ToastNotifications({ toasts }) {
         <span className="toast-icon">✓</span>
         <div className="toast-text">
           <p className="toast-title">{toast.product.name} added to bag</p>
-          <p className="toast-price">{toast.product.price}</p>
+          <p className="toast-price">{formatPrice(toast.product.price)}</p>
         </div>
       </div>
     </div>

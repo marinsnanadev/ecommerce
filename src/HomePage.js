@@ -3,6 +3,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Reveal from './Reveal';
 import ToastNotifications from './ToastNotifications';
+import { formatPrice } from './formatPrice';
 import whiteMiniPurse from './assets/clothing/purses/white-mini-purse.jpg';
 import { collections, featuredProducts, chunkCollections, blackDress, whiteSuit } from './homeData';
 
@@ -158,7 +159,7 @@ function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, ad
                 <div className="product-meta">
                   <span>{product.category}</span>
                   <h3>{product.name}</h3>
-                  <p className="product-price">{product.price}</p>
+                  <p className="product-price">{formatPrice(product.price)}</p>
                   <button type="button" className="purchase-btn" onClick={() => addToCart(product)}>Add to bag</button>
                 </div>
               </article>

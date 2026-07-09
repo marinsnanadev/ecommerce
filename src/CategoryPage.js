@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { imageMap } from './imageMap';
+import { API_BASE } from './apiConfig';
+import { formatPrice } from './formatPrice';
 import './CategoryPage.css';
 
 
@@ -16,7 +18,7 @@ function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBa
     if (!category?.name) return;
 
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/products/category/${category.name}`)
+    fetch(`${API_BASE}/products/category/${category.name}`)
       .then((res) => {
         if (!res.ok) throw new Error('Error fetching products');
         return res.json();
@@ -40,10 +42,10 @@ function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBa
 
   const sortedItems = [...filteredItems].sort((a, b) => {
     if (sortBy === 'price-low') {
-      return Number(a.price.replace('$', '')) - Number(b.price.replace('$', ''));
+      return Number(a.price) - Number(b.price);
     }
     if (sortBy === 'price-high') {
-      return Number(b.price.replace('$', '')) - Number(a.price.replace('$', ''));
+      return Number(b.price) - Number(a.price);
     }
     return Number(b.is_featured) - Number(a.is_featured) || Number(b.is_new) - Number(a.is_new);
   });
@@ -127,7 +129,7 @@ function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBa
                   <h3>{item.name}</h3>
                   <p>{item.blurb}</p>
                   <div className="category-product-meta">
-                    <span>{item.price}</span>
+                    <span>{formatPrice(item.price)}</span>
                     <button
                       type="button"
                       className="purchase-btn"
