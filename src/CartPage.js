@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import Footer from './Footer';
+import { formatPrice } from './formatPrice';
 import './CartPage.css';
 
 function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQuantity, onBackToHome, onClearCart, onGoToCheckout }) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const total = items.reduce(
-    (sum, item) => sum + parseInt(item.price.replace('$', ''), 10) * item.quantity,
+    (sum, item) => sum + Number(item.price) * item.quantity,
     0
   );
 
@@ -48,7 +49,7 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
                   <div className="cart-item-details">
                     <h3>{item.name}</h3>
                     <p className="cart-item-category">{item.category}</p>
-                    <p className="cart-item-price">{item.price}</p>
+                    <p className="cart-item-price">{formatPrice(item.price)}</p>
                   </div>
                   <div className="cart-item-controls">
                     <button type="button" onClick={() => onUpdateQuantity(item.item_id, Math.max(1, item.quantity - 1))}>
@@ -65,7 +66,7 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
                     </button>
                   </div>
                   <p className="cart-item-subtotal">
-                    ${(parseInt(item.price.replace('$', ''), 10) * item.quantity).toLocaleString()}
+                    {formatPrice(Number(item.price) * item.quantity)}
                   </p>
                   <button type="button" className="remove-btn" style={{margin: '0.5rem 0'}} onClick={() => onRemoveItem(item.item_id)}>
                     Remove
@@ -76,7 +77,7 @@ function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQua
             <div className="cart-summary">
               <div className="summary-row">
                 <span>Total:</span>
-                <span className="total-price">${total.toLocaleString()}</span>
+                <span className="total-price">{formatPrice(total)}</span>
               </div>
               <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <button

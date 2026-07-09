@@ -24,9 +24,9 @@ export const collections = [
 ];
 
 export const featuredProducts = [
-  { id: 'white-suit', index: '01', name: 'White Suit', price: '$180', category: 'Suits', image: whiteSuit },
-  { id: 'white-skirt', index: '02', name: 'White Skirt', price: '$130', category: 'Skirts', image: whiteSkirt },
-  { id: 'white-purse', index: '03', name: 'White Purse', price: '$130', category: 'Purses', image: whitePurse },
+  { id: 'white-suit', index: '01', name: 'White Suit', price: 180, category: 'Suits', image: whiteSuit },
+  { id: 'white-skirt', index: '02', name: 'White Skirt', price: 130, category: 'Skirts', image: whiteSkirt },
+  { id: 'white-purse', index: '03', name: 'White Purse', price: 130, category: 'Purses', image: whitePurse },
 ];
 
 export const chunkCollections = (items, size) => {
