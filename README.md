@@ -111,7 +111,9 @@ npm install
 npm start
 ```
 
-O front-end estará disponível em `http://localhost:3000`.
+O front-end estará disponível em `http://localhost:3000` e já aponta por padrão para a API em `http://127.0.0.1:8000`.
+
+> 💡 Se sua API estiver em outro endereço (ex: produção), copie `.env.example` para `.env` e ajuste a variável `REACT_APP_API_URL`.
 
 > ⚠️ Os dois servidores (back-end e front-end) precisam estar rodando simultaneamente para a aplicação funcionar completamente.
 

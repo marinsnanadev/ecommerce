@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -32,7 +32,7 @@ class CartItemUpdate(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Backend funcionando!"}
+    return {"message": "backend running"}
 
 @app.get("/categories")
 def get_categories(db: Session = Depends(get_db)):
@@ -46,7 +46,7 @@ def get_products(db: Session = Depends(get_db)):
 def get_products_by_category(category_name: str, db: Session = Depends(get_db)):
     category = db.query(models.Category).filter(models.Category.name == category_name).first()
     if not category:
-        return {"error": "Categoria não encontrada"}
+        raise HTTPException(status_code=404, detail="Category not found")
     return category.products
 
 
@@ -104,26 +104,36 @@ def add_to_cart(session_id: str, item: CartItemCreate, db: Session = Depends(get
         db.add(existing_item)
 
     db.commit()
-    return {"message": "Produto adicionado ao carrinho"}
+    return {"message": "Product added to cart"}
 
 
 @app.put("/cart/{session_id}/item/{item_id}")
 def update_cart_item(session_id: str, item_id: int, update: CartItemUpdate, db: Session = Depends(get_db)):
-    item = db.query(models.CartItem).filter(models.CartItem.id == item_id).first()
+    item = (
+        db.query(models.CartItem)
+        .join(models.Cart)
+        .filter(models.CartItem.id == item_id, models.Cart.session_id == session_id)
+        .first()
+    )
     if not item:
-        return {"error": "Item não encontrado"}
+        raise HTTPException(status_code=404, detail="Item not found")
     item.quantity = update.quantity
     db.commit()
-    return {"message": "Quantidade atualizada"}
+    return {"message": "Quantity updated"}
 
 
 @app.delete("/cart/{session_id}/item/{item_id}")
 def remove_cart_item(session_id: str, item_id: int, db: Session = Depends(get_db)):
-    item = db.query(models.CartItem).filter(models.CartItem.id == item_id).first()
+    item = (
+        db.query(models.CartItem)
+        .join(models.Cart)
+        .filter(models.CartItem.id == item_id, models.Cart.session_id == session_id)
+        .first()
+    )
     if item:
         db.delete(item)
         db.commit()
-    return {"message": "Item removido"}
+    return {"message": "Item removed from cart"}
 
 
 @app.delete("/cart/{session_id}")
@@ -133,4 +143,4 @@ def clear_cart(session_id: str, db: Session = Depends(get_db)):
         for item in cart.items:
             db.delete(item)
         db.commit()
-    return {"message": "Carrinho limpo"}
+    return {"message": "Clean cart"}
