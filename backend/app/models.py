@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float
+from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -30,13 +31,27 @@ class Product(Base):
     category = relationship("Category", back_populates="products")
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    cart = relationship("Cart", back_populates="user", uselist=False)
+
+
 class Cart(Base):
     __tablename__ = "carts"
 
     id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(String, unique=True, index=True)
+    session_id = Column(String, unique=True, index=True, nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=True)
 
     items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
+    user = relationship("User", back_populates="cart")
 
 
 class CartItem(Base):

@@ -1,26 +1,40 @@
 import { useState, useEffect, useRef } from 'react';
 import { imageMap } from './imageMap';
 import { getSessionId } from './session';
-import { fetchCart, addItemToCart, updateItemQuantity, removeItemFromCart, clearCartApi } from './cartApi';
+import {
+  fetchCart,
+  addItemToCart,
+  updateItemQuantity,
+  removeItemFromCart,
+  clearCartApi,
+  fetchMyCart,
+  addItemToMyCart,
+  updateMyItemQuantity,
+  removeMyItemFromCart,
+  clearMyCartApi,
+} from './cartApi';
 
-export function useCart() {
+export function useCart(token) {
   const [cartItems, setCartItems] = useState([]);
   const [toasts, setToasts] = useState([]);
   const sessionId = useRef(getSessionId()).current;
+  const isAuthenticated = Boolean(token);
+
+  const mapCartResponse = (data) =>
+    data.map((entry) => ({
+      item_id: entry.item_id,
+      id: entry.product.id,
+      name: entry.product.name,
+      price: entry.product.price,
+      image: imageMap[entry.product.image],
+      category: entry.product.category,
+      quantity: entry.quantity,
+    }));
 
   const loadCart = async () => {
     try {
-      const data = await fetchCart(sessionId);
-      const mapped = data.map((entry) => ({
-        item_id: entry.item_id,
-        id: entry.product.id,
-        name: entry.product.name,
-        price: entry.product.price,
-        image: imageMap[entry.product.image],
-        category: entry.product.category,
-        quantity: entry.quantity,
-      }));
-      setCartItems(mapped);
+      const data = isAuthenticated ? await fetchMyCart(token) : await fetchCart(sessionId);
+      setCartItems(mapCartResponse(data));
     } catch (err) {
       console.warn('Erro ao carregar carrinho:', err);
       setCartItems([]);
@@ -30,11 +44,15 @@ export function useCart() {
   useEffect(() => {
     loadCart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthenticated]);
 
   const addToCart = async (product) => {
     try {
-      await addItemToCart(sessionId, product.id, 1);
+      if (isAuthenticated) {
+        await addItemToMyCart(token, product.id, 1);
+      } else {
+        await addItemToCart(sessionId, product.id, 1);
+      }
       await loadCart();
     } catch (err) {
       console.error('Erro ao adicionar ao carrinho:', err);
@@ -49,7 +67,11 @@ export function useCart() {
 
   const removeFromCart = async (itemId) => {
     try {
-      await removeItemFromCart(sessionId, itemId);
+      if (isAuthenticated) {
+        await removeMyItemFromCart(token, itemId);
+      } else {
+        await removeItemFromCart(sessionId, itemId);
+      }
       await loadCart();
     } catch (err) {
       console.error('Erro ao remover item:', err);
@@ -58,7 +80,11 @@ export function useCart() {
 
   const updateQuantity = async (itemId, quantity) => {
     try {
-      await updateItemQuantity(sessionId, itemId, quantity);
+      if (isAuthenticated) {
+        await updateMyItemQuantity(token, itemId, quantity);
+      } else {
+        await updateItemQuantity(sessionId, itemId, quantity);
+      }
       await loadCart();
     } catch (err) {
       console.error('Erro ao atualizar quantidade:', err);
@@ -67,12 +93,16 @@ export function useCart() {
 
   const clearCart = async () => {
     try {
-      await clearCartApi(sessionId);
+      if (isAuthenticated) {
+        await clearMyCartApi(token);
+      } else {
+        await clearCartApi(sessionId);
+      }
       await loadCart();
     } catch (err) {
       console.error('Erro ao limpar carrinho:', err);
     }
   };
 
-  return { cartItems, toasts, addToCart, removeFromCart, updateQuantity, clearCart };
+  return { cartItems, toasts, addToCart, removeFromCart, updateQuantity, clearCart, reloadCart: loadCart, sessionId };
 }
