@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 
-function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit }) {
+function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit, user, onLogout, onOpenLogin }) {
   return (
     <>
       <nav className="site-nav">
@@ -11,6 +11,18 @@ function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, black
             Shop
           </button>
           <a href="#story">Story</a>
+          {user ? (
+            <span className="nav-account">
+              Hi, {user.name.split(' ')[0]}
+              <button type="button" className="nav-link-btn nav-logout-btn" onClick={onLogout}>
+                Log out
+              </button>
+            </span>
+          ) : (
+            <button type="button" className="nav-link-btn" onClick={onOpenLogin}>
+              Log in
+            </button>
+          )}
         </div>
         <div style={{ position: 'relative' }}>
           <button type="button" className="nav-bag" aria-label="View bag" onClick={onOpenCart}>

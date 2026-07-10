@@ -7,7 +7,7 @@ import { formatPrice } from './formatPrice';
 import whiteMiniPurse from './assets/clothing/purses/white-mini-purse.jpg';
 import { collections, featuredProducts, chunkCollections, blackDress, whiteSuit } from './homeData';
 
-function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, addToCart, checkoutComplete, toasts }) {
+function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, addToCart, checkoutComplete, toasts, user, onLogout, onOpenLogin }) {
   const [frontImageIndex, setFrontImageIndex] = useState(0);
   const [collectionOffset, setCollectionOffset] = useState(0);
   const [isCompactView, setIsCompactView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
@@ -57,6 +57,9 @@ function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, ad
         frontImageIndex={frontImageIndex}
         blackDress={blackDress}
         whiteSuit={whiteSuit}
+        user={user}
+        onLogout={onLogout}
+        onOpenLogin={onOpenLogin}
       />
 
       <ToastNotifications toasts={toasts} />
