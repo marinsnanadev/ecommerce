@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AuthForm from './AuthForm';
+import './Nav.css';
 import './CheckoutPage.css';
 import './CheckoutGate.css';
 

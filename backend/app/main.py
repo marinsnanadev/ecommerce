@@ -1,5 +1,7 @@
+import os
 from typing import Optional
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -14,11 +16,23 @@ from .auth import (
     get_current_user,
 )
 
+load_dotenv()
+
 app = FastAPI()
+
+# Em produção, defina CORS_ORIGINS no backend/.env com a(s) URL(s) real(is)
+# do front-end, separadas por vírgula (ex: "https://meusite.com,https://www.meusite.com").
+# Em desenvolvimento, já cai no localhost:3000 padrão do Create React App.
+_default_origins = "http://localhost:3000"
+allowed_origins = [
+    origin.strip()
+    for origin in os.environ.get("CORS_ORIGINS", _default_origins).split(",")
+    if origin.strip()
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

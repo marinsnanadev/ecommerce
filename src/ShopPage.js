@@ -1,36 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { imageMap } from './imageMap';
 import { API_BASE } from './apiConfig';
+import Reveal from './Reveal';
+import './Nav.css';
 import './ShopPage.css';
-
-function Reveal({ children, className = '', as: Tag = 'div', ...rest }) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return undefined;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(node);
-        }
-      },
-      { threshold: 0.18 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <Tag ref={ref} className={`reveal ${visible ? 'is-visible' : ''} ${className}`.trim()} {...rest}>
-      {children}
-    </Tag>
-  );
-}
 
 function ShopPage({ onBackToHome, onSelectCategory, cartItemsCount = 0, onOpenCart }) {
   const [categories, setCategories] = useState([]);

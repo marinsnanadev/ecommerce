@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Footer from './Footer';
 import { formatPrice } from './formatPrice';
+import './Nav.css';
 import './CartPage.css';
 
 function CartPage({ items, cartItemsCount, onOpenCart, onRemoveItem, onUpdateQuantity, onBackToHome, onClearCart, onGoToCheckout }) {

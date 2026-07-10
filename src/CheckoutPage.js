@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Footer from './Footer';
 import { formatPrice } from './formatPrice';
+import './Nav.css';
 import './CheckoutPage.css';
 import creditCardImage from './assets/images/credit-card.png';
 import paypalImage from './assets/images/paypal.png';
