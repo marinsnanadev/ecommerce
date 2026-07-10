@@ -21,7 +21,7 @@ function Reveal({ children, className = '', as: Tag = 'div', ...rest }) {
   }, []);
 
   return (
-    <Tag ref={ref} className={`reveal ${visible ? 'is-visible' : ''} ${className}`} {...rest}>
+    <Tag ref={ref} className={`reveal ${visible ? 'is-visible' : ''} ${className}`.trim()} {...rest}>
       {children}
     </Tag>
   );

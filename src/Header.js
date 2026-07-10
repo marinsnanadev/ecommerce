@@ -1,4 +1,5 @@
 import React from 'react';
+import './Nav.css';
 import './Header.css';
 
 function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit, user, onLogout, onOpenLogin }) {

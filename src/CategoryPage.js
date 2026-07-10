@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { imageMap } from './imageMap';
 import { API_BASE } from './apiConfig';
 import { formatPrice } from './formatPrice';
+import './Nav.css';
 import './CategoryPage.css';
 
 
