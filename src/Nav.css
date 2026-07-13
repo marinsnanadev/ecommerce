@@ -80,6 +80,14 @@
   color: var(--text-muted);
 }
 
+.nav-account-name {
+  color: var(--text-muted);
+}
+
+.nav-account-name:hover {
+  color: var(--accent);
+}
+
 .nav-bag {
   display: flex;
   align-items: center;

@@ -78,6 +78,15 @@
   gap: 0.4rem;
 }
 
+.checkout-error {
+  margin: 0.4rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(200, 60, 60, 0.1);
+  color: #a83232;
+  font-size: 0.88rem;
+}
+
 .payment-option {
   display: flex;
   align-items: center;

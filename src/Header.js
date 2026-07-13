@@ -2,7 +2,7 @@ import React from 'react';
 import './Nav.css';
 import './Header.css';
 
-function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit, user, onLogout, onOpenLogin }) {
+function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit, user, onLogout, onOpenLogin, onOpenAccount }) {
   return (
     <>
       <nav className="site-nav">
@@ -14,7 +14,9 @@ function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, black
           <a href="#story">Story</a>
           {user ? (
             <span className="nav-account">
-              Hi, {user.name.split(' ')[0]}
+              <button type="button" className="nav-link-btn nav-account-name" onClick={onOpenAccount}>
+                Hi, {user.name.split(' ')[0]}
+              </button>
               <button type="button" className="nav-link-btn nav-logout-btn" onClick={onLogout}>
                 Log out
               </button>
@@ -25,14 +27,27 @@ function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, black
             </button>
           )}
         </div>
-        <div style={{ position: 'relative' }}>
-          <button type="button" className="nav-bag" aria-label="View bag" onClick={onOpenCart}>
+        <div className="nav-actions">
+          <button
+            type="button"
+            className="nav-bag"
+            aria-label={user ? 'My account' : 'Log in'}
+            onClick={user ? onOpenAccount : onOpenLogin}
+          >
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M6 8h12l-1 12H7L6 8Z" />
-              <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+              <circle cx="12" cy="8" r="3.4" />
+              <path d="M5 20c0-3.6 3.1-6.4 7-6.4s7 2.8 7 6.4" />
             </svg>
           </button>
-          {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
+          <div style={{ position: 'relative' }}>
+            <button type="button" className="nav-bag" aria-label="View bag" onClick={onOpenCart}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <path d="M6 8h12l-1 12H7L6 8Z" />
+                <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+              </svg>
+            </button>
+            {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
+          </div>
         </div>
       </nav>
 

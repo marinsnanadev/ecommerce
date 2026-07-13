@@ -13,8 +13,6 @@ function CategoryPage({ category, cartItemsCount, onOpenCart, onBackToShop, onBa
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch products for the selected category when the component mounts or when the category changes
-
   useEffect(() => {
     if (!category?.name) return;
 
