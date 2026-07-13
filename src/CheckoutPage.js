@@ -1,17 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Footer from './Footer';
 import { formatPrice } from './formatPrice';
+import { PAYMENT_METHODS } from './paymentMethods';
+import { fetchAccount } from './accountApi';
 import './Nav.css';
+import './CartPage.css';
 import './CheckoutPage.css';
-import creditCardImage from './assets/images/credit-card.png';
-import paypalImage from './assets/images/paypal.png';
-import applePayImage from './assets/images/apple-pay.png';
-
-const PAYMENT_METHODS = [
-    { id: 'credit-card', label: 'Credit card', image: creditCardImage },
-    { id: 'paypal', label: 'PayPal', image: paypalImage },
-    { id: 'apple-pay', label: 'Apple Pay', image: applePayImage },
-];
 
 const SHIPPING_COST = 12;
 const TAX_RATE = 0.08;
@@ -62,7 +56,7 @@ function PaymentMethodSelector({ selectedId, onSelect }) {
     );
 }
 
-function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder }) {
+function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder, isSubmitting, error }) {
     return (
         <aside className="checkout-summary-card">
             <h2>Order summary</h2>
@@ -97,15 +91,53 @@ function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder }) {
                 </div>
             </div>
 
-            <button type="button" className="checkout-btn" onClick={onPlaceOrder}>
-                Place order
+            {error && <p className="checkout-error">{error}</p>}
+
+            <button type="button" className="checkout-btn" onClick={onPlaceOrder} disabled={isSubmitting}>
+                {isSubmitting ? 'Placing order...' : 'Place order'}
             </button>
         </aside>
     );
 }
 
-function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder }) {
+function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user, token }) {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHODS[0].id);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+    const [form, setForm] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        phone: '',
+        address_street: '',
+        address_city_state: '',
+        address_zip: '',
+    });
+
+    useEffect(() => {
+        if (!token) return;
+        fetchAccount(token)
+            .then((account) => {
+                setForm((prev) => ({
+                    ...prev,
+                    name: account.name || prev.name,
+                    email: account.email || prev.email,
+                    phone: account.default_phone || prev.phone,
+                    address_street: account.default_address_street || prev.address_street,
+                    address_city_state: account.default_address_city_state || prev.address_city_state,
+                    address_zip: account.default_address_zip || prev.address_zip,
+                }));
+                if (account.default_payment_method) {
+                    setSelectedPaymentMethod(account.default_payment_method);
+                }
+            })
+            .catch(() => {
+                // sem defaults salvos ainda, sem problema — segue com o formulário em branco
+            });
+    }, [token]);
+
+    const updateField = (field) => (event) => {
+        setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    };
 
     const subtotal = useMemo(
         () => items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0),
@@ -113,6 +145,18 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder }) {
     );
     const tax = Math.round(subtotal * TAX_RATE);
     const total = subtotal + tax + SHIPPING_COST;
+
+    const handlePlaceOrder = async () => {
+        setError(null);
+        setIsSubmitting(true);
+        try {
+            await onPlaceOrder({ ...form, payment_method: selectedPaymentMethod });
+        } catch (err) {
+            setError(err.message || 'Something went wrong. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="app-shell">
@@ -147,15 +191,55 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder }) {
                 <div className="checkout-grid">
                     <section className="checkout-form-card">
                         <FormSection title="Client information">
-                            <FormField id="client-name" label="Name" type="text" placeholder="John Smith" required />
-                            <FormField id="client-email" label="Email" type="email" placeholder="johnsmith@example.com" />
-                            <FormField id="client-phone" label="Phone" type="tel" placeholder="+1 (555) 123-4567" />
+                            <FormField
+                                id="client-name"
+                                label="Name"
+                                type="text"
+                                placeholder="John Smith"
+                                value={form.name}
+                                onChange={updateField('name')}
+                                required
+                            />
+                            <FormField
+                                id="client-email"
+                                label="Email"
+                                type="email"
+                                placeholder="johnsmith@example.com"
+                                value={form.email}
+                                onChange={updateField('email')}
+                            />
+                            <FormField
+                                id="client-phone"
+                                label="Phone"
+                                type="tel"
+                                placeholder="+1 (555) 123-4567"
+                                value={form.phone}
+                                onChange={updateField('phone')}
+                            />
                         </FormSection>
 
                         <FormSection title="Delivery address">
-                            <FormField id="delivery-address" label="Street, number" placeholder="Rio Street, 123" />
-                            <FormField id="delivery-city-state" label="City, State" placeholder="Rio de Janeiro, Rio de Janeiro" />
-                            <FormField id="delivery-zip-code" label="ZIP Code" placeholder="20000-000" />
+                            <FormField
+                                id="delivery-address"
+                                label="Street, number"
+                                placeholder="Rio Street, 123"
+                                value={form.address_street}
+                                onChange={updateField('address_street')}
+                            />
+                            <FormField
+                                id="delivery-city-state"
+                                label="City, State"
+                                placeholder="Rio de Janeiro, Rio de Janeiro"
+                                value={form.address_city_state}
+                                onChange={updateField('address_city_state')}
+                            />
+                            <FormField
+                                id="delivery-zip-code"
+                                label="ZIP Code"
+                                placeholder="20000-000"
+                                value={form.address_zip}
+                                onChange={updateField('address_zip')}
+                            />
                         </FormSection>
 
                         <PaymentMethodSelector
@@ -170,7 +254,9 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder }) {
                         tax={tax}
                         shipping={SHIPPING_COST}
                         total={total}
-                        onPlaceOrder={onPlaceOrder}
+                        onPlaceOrder={handlePlaceOrder}
+                        isSubmitting={isSubmitting}
+                        error={error}
                     />
                 </div>
             </main>

@@ -11,9 +11,11 @@ import ConfirmModal from './ConfirmModal';
 import ShopPage from './ShopPage';
 import CategoryPage from './CategoryPage';
 import HomePage from './HomePage';
+import AccountPage from './AccountPage';
 import ToastNotifications from './ToastNotifications';
 import { useCart } from './useCart';
 import { useAuth } from './useAuth';
+import { placeOrder } from './accountApi';
 
 function App() {
   const [showStorefront, setShowStorefront] = useState(false);
@@ -25,7 +27,7 @@ function App() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const auth = useAuth();
-  const { cartItems, toasts, addToCart, removeFromCart, updateQuantity, clearCart, sessionId } = useCart(auth.token);
+  const { cartItems, toasts, addToCart, removeFromCart, updateQuantity, clearCart, reloadCart, sessionId } = useCart(auth.token);
 
   const handleSelectCategory = (category) => {
     setSelectedCategory(category);
@@ -60,7 +62,6 @@ function App() {
   }
 
   if (currentPage === 'checkout') {
-    // Convidado ainda não escolheu como prosseguir: mostra a tela de decisão
     if (!auth.isAuthenticated && !continueAsGuest) {
       return (
         <CheckoutGate
@@ -79,19 +80,38 @@ function App() {
         <CheckoutPage
           items={cartItems}
           cartItemsCount={cartItems.length}
+          user={auth.user}
+          token={auth.token}
           onBackToCart={() => setCurrentPage('cart')}
           onBackToHome={() => {
             setCurrentPage('home');
             setCheckoutComplete(false);
           }}
-          onPlaceOrder={() => {
+          onPlaceOrder={async (checkoutInfo) => {
+            if (auth.isAuthenticated) {
+              await placeOrder(auth.token, checkoutInfo);
+              await reloadCart();
+            } else {
+              await clearCart();
+            }
             setCheckoutComplete(true);
             setContinueAsGuest(false);
             setCurrentPage('home');
-            clearCart();
+            window.setTimeout(() => setCheckoutComplete(false), 4000);
           }}
         />
       </>
+    );
+  }
+
+  if (currentPage === 'account' && auth.isAuthenticated) {
+    return (
+      <AccountPage
+        token={auth.token}
+        cartItemsCount={cartItems.length}
+        onOpenCart={() => setCurrentPage('cart')}
+        onBackToHome={() => setCurrentPage('home')}
+      />
     );
   }
 
@@ -135,6 +155,7 @@ function App() {
         user={auth.user}
         onLogout={() => setShowLogoutConfirm(true)}
         onOpenLogin={() => setShowAuthModal(true)}
+        onOpenAccount={() => setCurrentPage('account')}
       />
       {showLogoutConfirm && (
         <ConfirmModal

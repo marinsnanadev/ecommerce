@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './AuthForm.css';
 
 function AuthForm({ onLogin, onRegister, submitLabel }) {
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [mode, setMode] = useState('login'); 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

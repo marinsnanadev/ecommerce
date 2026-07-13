@@ -204,8 +204,6 @@ body {
   box-shadow: 0 12px 24px rgba(81, 59, 156, 0.18);
 }
 
-/* NOTE: original file redefined .secondary-btn a second time under the
-   "Cart Page" comment; merged here into the final computed look/hover. */
 .secondary-btn {
   color: var(--accent);
   background: transparent;

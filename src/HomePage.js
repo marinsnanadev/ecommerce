@@ -7,7 +7,7 @@ import { formatPrice } from './formatPrice';
 import whiteMiniPurse from './assets/clothing/purses/white-mini-purse.jpg';
 import { collections, featuredProducts, chunkCollections, blackDress, whiteSuit } from './homeData';
 
-function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, addToCart, checkoutComplete, toasts, user, onLogout, onOpenLogin }) {
+function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, addToCart, checkoutComplete, toasts, user, onLogout, onOpenLogin, onOpenAccount }) {
   const [frontImageIndex, setFrontImageIndex] = useState(0);
   const [collectionOffset, setCollectionOffset] = useState(0);
   const [isCompactView, setIsCompactView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
@@ -60,6 +60,7 @@ function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, ad
         user={user}
         onLogout={onLogout}
         onOpenLogin={onOpenLogin}
+        onOpenAccount={onOpenAccount}
       />
 
       <ToastNotifications toasts={toasts} />
@@ -186,9 +187,9 @@ function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, ad
         <div className="social-media">
           <h3>Follow Us</h3>
           <ul>
-            <li><a href="" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-            <li><a href="" target="_blank" rel="noopener noreferrer">Facebook</a></li>
-            <li><a href="" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+            <li><button type="button" className="footer-social-link">Instagram</button></li>
+            <li><button type="button" className="footer-social-link">Facebook</button></li>
+            <li><button type="button" className="footer-social-link">Twitter</button></li>
           </ul>
         </div>
 

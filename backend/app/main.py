@@ -70,6 +70,25 @@ class TokenResponse(BaseModel):
     user: UserOut
 
 
+class CheckoutInfo(BaseModel):
+    name: str
+    email: EmailStr
+    phone: Optional[str] = None
+    address_street: Optional[str] = None
+    address_city_state: Optional[str] = None
+    address_zip: Optional[str] = None
+    payment_method: str
+
+
+class AccountUpdate(BaseModel):
+    name: Optional[str] = None
+    default_phone: Optional[str] = None
+    default_address_street: Optional[str] = None
+    default_address_city_state: Optional[str] = None
+    default_address_zip: Optional[str] = None
+    default_payment_method: Optional[str] = None
+
+
 @app.get("/")
 def read_root():
     return {"message": "backend running"}
@@ -168,6 +187,40 @@ def _merge_guest_cart_into_user_cart(db: Session, guest_cart: models.Cart, user_
             guest_cart.items.remove(guest_item)
             user_cart.items.append(guest_item)
     db.delete(guest_cart)
+
+
+# ---------------------------------------------------------------------------
+# Helpers de pedido/conta
+# ---------------------------------------------------------------------------
+
+# Mantidos em sincronia com as mesmas constantes no front-end (CheckoutPage.js).
+SHIPPING_COST = 12.0
+TAX_RATE = 0.08
+
+
+def _serialize_order(order: models.Order):
+    return {
+        "id": order.id,
+        "created_at": order.created_at.isoformat() if order.created_at else None,
+        "payment_method": order.payment_method,
+        "address_street": order.address_street,
+        "address_city_state": order.address_city_state,
+        "address_zip": order.address_zip,
+        "subtotal": order.subtotal,
+        "tax": order.tax,
+        "shipping": order.shipping,
+        "total": order.total,
+        "items": [
+            {
+                "product_id": item.product_id,
+                "name": item.product_name,
+                "price": item.product_price,
+                "image": item.product_image,
+                "quantity": item.quantity,
+            }
+            for item in order.items
+        ],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -288,6 +341,114 @@ def clear_my_cart(db: Session = Depends(get_db), current_user: models.User = Dep
             db.delete(item)
         db.commit()
     return {"message": "Clean cart"}
+
+
+# ---------------------------------------------------------------------------
+# Pedidos e conta do cliente
+# ---------------------------------------------------------------------------
+
+@app.post("/orders")
+def place_order(
+    payload: CheckoutInfo,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    cart = get_or_create_user_cart(db, current_user.id)
+    if not cart.items:
+        raise HTTPException(status_code=400, detail="Cart is empty")
+
+    # Preço/itens vêm do carrinho já salvo no servidor, nunca do que o
+    # cliente mandar no payload, evita que o total seja manipulado.
+    subtotal = sum(item.product.price * item.quantity for item in cart.items)
+    tax = round(subtotal * TAX_RATE, 2)
+    total = subtotal + tax + SHIPPING_COST
+
+    order = models.Order(
+        user_id=current_user.id,
+        name=payload.name,
+        email=payload.email,
+        phone=payload.phone,
+        address_street=payload.address_street,
+        address_city_state=payload.address_city_state,
+        address_zip=payload.address_zip,
+        payment_method=payload.payment_method,
+        subtotal=subtotal,
+        tax=tax,
+        shipping=SHIPPING_COST,
+        total=total,
+    )
+    db.add(order)
+    db.flush()  # gera order.id antes de criar os itens
+
+    for cart_item in cart.items:
+        db.add(models.OrderItem(
+            order_id=order.id,
+            product_id=cart_item.product_id,
+            product_name=cart_item.product.name,
+            product_price=cart_item.product.price,
+            product_image=cart_item.product.image,
+            quantity=cart_item.quantity,
+        ))
+
+    # Guarda como "preferência" pra pré-preencher o próximo checkout
+    # e aparecer na página de conta.
+    current_user.default_phone = payload.phone
+    current_user.default_address_street = payload.address_street
+    current_user.default_address_city_state = payload.address_city_state
+    current_user.default_address_zip = payload.address_zip
+    current_user.default_payment_method = payload.payment_method
+
+    for item in list(cart.items):
+        db.delete(item)
+
+    db.commit()
+    db.refresh(order)
+    return _serialize_order(order)
+
+
+@app.get("/account")
+def get_account(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    orders = (
+        db.query(models.Order)
+        .filter(models.Order.user_id == current_user.id)
+        .order_by(models.Order.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "default_phone": current_user.default_phone,
+        "default_address_street": current_user.default_address_street,
+        "default_address_city_state": current_user.default_address_city_state,
+        "default_address_zip": current_user.default_address_zip,
+        "default_payment_method": current_user.default_payment_method,
+        "orders": [_serialize_order(order) for order in orders],
+    }
+
+
+@app.put("/account")
+def update_account(
+    payload: AccountUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    updates = payload.model_dump(exclude_unset=True)
+    for field, value in updates.items():
+        setattr(current_user, field, value)
+    db.commit()
+    db.refresh(current_user)
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "default_phone": current_user.default_phone,
+        "default_address_street": current_user.default_address_street,
+        "default_address_city_state": current_user.default_address_city_state,
+        "default_address_zip": current_user.default_address_zip,
+        "default_payment_method": current_user.default_payment_method,
+    }
 
 
 # ---------------------------------------------------------------------------
