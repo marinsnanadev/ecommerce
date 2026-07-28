@@ -28,7 +28,7 @@ export async function placeOrder(token, checkoutInfo) {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.detail || 'Erro ao finalizar pedido');
+    throw new Error(body.detail || 'Error completing order');
   }
   return res.json();
 }

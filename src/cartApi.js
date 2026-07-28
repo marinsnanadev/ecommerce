@@ -2,7 +2,7 @@ import { API_BASE } from './apiConfig';
 
 export async function fetchCart(sessionId) {
   const res = await fetch(`${API_BASE}/cart/${sessionId}`);
-  if (!res.ok) throw new Error('Erro ao buscar carrinho');
+  if (!res.ok) throw new Error('Error fetching cart');
   return res.json();
 }
 
@@ -12,7 +12,7 @@ export async function addItemToCart(sessionId, productId, quantity = 1) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ product_id: productId, quantity }),
   });
-  if (!res.ok) throw new Error('Erro ao adicionar ao carrinho');
+  if (!res.ok) throw new Error('Error adding to cart');
   return res.json();
 }
 
@@ -22,7 +22,7 @@ export async function updateItemQuantity(sessionId, itemId, quantity) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ quantity }),
   });
-  if (!res.ok) throw new Error('Erro ao atualizar quantidade');
+  if (!res.ok) throw new Error('Error updating quantity');
   return res.json();
 }
 
@@ -30,7 +30,7 @@ export async function removeItemFromCart(sessionId, itemId) {
   const res = await fetch(`${API_BASE}/cart/${sessionId}/item/${itemId}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw new Error('Erro ao remover item');
+  if (!res.ok) throw new Error('Error removing item');
   return res.json();
 }
 
@@ -38,11 +38,11 @@ export async function clearCartApi(sessionId) {
   const res = await fetch(`${API_BASE}/cart/${sessionId}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw new Error('Erro ao limpar carrinho');
+  if (!res.ok) throw new Error('Error clearing cart');
   return res.json();
 }
 
-// --- Carrinho do usuário autenticado -------------------------------------
+// --- Authenticated user's cart -------------------------------------
 
 function authHeaders(token) {
   return { Authorization: `Bearer ${token}` };
@@ -50,7 +50,7 @@ function authHeaders(token) {
 
 export async function fetchMyCart(token) {
   const res = await fetch(`${API_BASE}/cart/me`, { headers: authHeaders(token) });
-  if (!res.ok) throw new Error('Erro ao buscar carrinho');
+  if (!res.ok) throw new Error('Error fetching cart');
   return res.json();
 }
 
@@ -60,7 +60,7 @@ export async function addItemToMyCart(token, productId, quantity = 1) {
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
     body: JSON.stringify({ product_id: productId, quantity }),
   });
-  if (!res.ok) throw new Error('Erro ao adicionar ao carrinho');
+  if (!res.ok) throw new Error('Error adding to cart');
   return res.json();
 }
 
@@ -70,7 +70,7 @@ export async function updateMyItemQuantity(token, itemId, quantity) {
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
     body: JSON.stringify({ quantity }),
   });
-  if (!res.ok) throw new Error('Erro ao atualizar quantidade');
+  if (!res.ok) throw new Error('Error updating quantity');
   return res.json();
 }
 
@@ -79,7 +79,7 @@ export async function removeMyItemFromCart(token, itemId) {
     method: 'DELETE',
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error('Erro ao remover item');
+  if (!res.ok) throw new Error('Error removing item');
   return res.json();
 }
 
@@ -88,6 +88,6 @@ export async function clearMyCartApi(token) {
     method: 'DELETE',
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error('Erro ao limpar carrinho');
+  if (!res.ok) throw new Error('Error clearing cart');
   return res.json();
 }

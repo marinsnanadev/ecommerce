@@ -1,8 +1,8 @@
 # VIOLET — E-commerce Full Stack
 
-Loja virtual de moda com front-end em React e back-end em Python (FastAPI), com persistência de dados em banco SQL, autenticação de usuários, carrinho de compras e checkout funcionais.
+Full-stack fashion store with a React front-end and a Python (FastAPI) back-end, featuring persistent data in a SQL database, user authentication, a shopping cart, and a functional checkout flow.
 
-![status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![status](https://img.shields.io/badge/status-in%20development-yellow)
 ![react](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![fastapi](https://img.shields.io/badge/FastAPI-005571?logo=fastapi)
@@ -15,7 +15,7 @@ Loja virtual de moda com front-end em React e back-end em Python (FastAPI), com 
 ### Home
 ![Home](docs/gifs/splash-and-homepage.gif)
 
-### Login e logout
+### Login and logout
 ![Account](docs/gifs/login-logout.gif)
 
 ### Checkout
@@ -23,115 +23,115 @@ Loja virtual de moda com front-end em React e back-end em Python (FastAPI), com 
 
 ---
 
-## ✨ Sobre o projeto
+## ✨ About the project
 
-VIOLET é uma loja de roupas e acessórios construída inicialmente como projeto front-end, e evoluída para uma aplicação full stack completa. O objetivo foi sair de dados fictícios (hardcoded) para uma arquitetura real, com:
+VIOLET is a clothing and accessories store, initially built as a front-end-only project and evolved into a complete full-stack application. The goal was to move away from hardcoded, fictional data toward a real architecture, with:
 
-- API REST própria, construída em Python
-- Banco de dados relacional persistindo produtos, categorias, usuários, carrinho e pedidos
-- Autenticação de usuários com senha criptografada e sessão via JWT
-- Fluxo de checkout completo, com opção de comprar como convidado ou criar conta
-- Front-end em React consumindo os dados dinamicamente
+- A custom REST API, built in Python
+- A relational database persisting products, categories, users, carts, and orders
+- User authentication with encrypted passwords and JWT-based sessions
+- A complete checkout flow, with the option to check out as a guest or create an account
+- A React front-end consuming the data dynamically
 
 ## 🧱 Tech Stack
 
 **Front-end**
 - React
-- CSS customizado (animações, scroll reveal, design responsivo)
-- Testes com Jest + Testing Library
+- Custom CSS (animations, scroll reveal, responsive design)
+- Tests with Jest + Testing Library
 
 **Back-end**
 - Python 3
 - FastAPI
 - SQLAlchemy (ORM)
-- SQLite (banco de dados)
-- Uvicorn (servidor ASGI)
-- JWT (autenticação) + hash de senha com PBKDF2
-- Testes com pytest
+- SQLite (database)
+- Uvicorn (ASGI server)
+- JWT (authentication) + password hashing with PBKDF2
+- Tests with pytest
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
-- [x] Listagem de categorias e produtos vinda do banco de dados
-- [x] Filtros (Novo / Destaque) e ordenação por preço
-- [x] Carrinho de compras persistente (sobrevive a refresh da página), vinculado a uma sessão de visitante
-- [x] Adicionar, atualizar quantidade e remover itens do carrinho via API
-- [x] Cadastro e login de usuários (senha com hash, sessão via JWT)
-- [x] Ao logar ou criar conta, o carrinho de convidado é mesclado automaticamente com o da conta
-- [x] Checkout com escolha entre continuar como convidado ou entrar/criar conta
-- [x] Pedido calculado e persistido no servidor (nunca confia em preço enviado pelo cliente)
-- [x] Página de conta do cliente: endereço, telefone e forma de pagamento preferida (editáveis) + histórico de pedidos
-- [x] Modal de confirmação antes de deslogar
-- [x] Documentação interativa da API gerada automaticamente (Swagger)
-- [x] Suíte de testes automatizados no back-end (pytest) e no front-end (Jest)
+- [x] Category and product listing pulled from the database
+- [x] Filters (New / Featured) and sorting by price
+- [x] Persistent shopping cart (survives page refresh), tied to a guest session
+- [x] Add, update quantity, and remove cart items via the API
+- [x] User registration and login (hashed password, JWT-based session)
+- [x] The guest cart is automatically merged into the account cart on login/registration
+- [x] Checkout with the choice to continue as a guest or sign in/create an account
+- [x] Order total calculated and persisted on the server (never trusts a price sent by the client)
+- [x] Customer account page: address, phone, and preferred payment method (editable) + order history
+- [x] Confirmation modal before logging out
+- [x] Auto-generated interactive API documentation (Swagger)
+- [x] Automated test suite on the back-end (pytest) and front-end (Jest)
 
-## 🔌 Endpoints da API
+## 🔌 API Endpoints
 
-**Produtos e categorias**
+**Products and categories**
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |--------|------|-----------|
-| GET | `/categories` | Lista todas as categorias |
-| GET | `/products` | Lista todos os produtos |
-| GET | `/products/category/{category_name}` | Lista produtos de uma categoria específica |
+| GET | `/categories` | Lists all categories |
+| GET | `/products` | Lists all products |
+| GET | `/products/category/{category_name}` | Lists products in a specific category |
 
-**Autenticação**
+**Authentication**
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |--------|------|-----------|
-| POST | `/auth/register` | Cria uma conta nova (mescla o carrinho de convidado, se `session_id` for enviado) |
-| POST | `/auth/login` | Autentica e retorna um token (mescla o carrinho de convidado, se `session_id` for enviado) |
-| GET | `/auth/me` | Retorna os dados do usuário autenticado |
+| POST | `/auth/register` | Creates a new account (merges the guest cart, if `session_id` is sent) |
+| POST | `/auth/login` | Authenticates and returns a token (merges the guest cart, if `session_id` is sent) |
+| GET | `/auth/me` | Returns the authenticated user's data |
 
-**Carrinho — convidado (por `session_id`)**
+**Cart — guest (by `session_id`)**
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |--------|------|-----------|
-| GET | `/cart/{session_id}` | Retorna os itens do carrinho da sessão |
-| POST | `/cart/{session_id}/add` | Adiciona um produto ao carrinho |
-| PUT | `/cart/{session_id}/item/{item_id}` | Atualiza a quantidade de um item |
-| DELETE | `/cart/{session_id}/item/{item_id}` | Remove um item do carrinho |
-| DELETE | `/cart/{session_id}` | Limpa o carrinho inteiro |
+| GET | `/cart/{session_id}` | Returns the session's cart items |
+| POST | `/cart/{session_id}/add` | Adds a product to the cart |
+| PUT | `/cart/{session_id}/item/{item_id}` | Updates an item's quantity |
+| DELETE | `/cart/{session_id}/item/{item_id}` | Removes an item from the cart |
+| DELETE | `/cart/{session_id}` | Clears the entire cart |
 
-**Carrinho — usuário autenticado** (requer header `Authorization: Bearer {token}`)
+**Cart — authenticated user** (requires `Authorization: Bearer {token}` header)
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |--------|------|-----------|
-| GET | `/cart/me` | Retorna os itens do carrinho da conta |
-| POST | `/cart/me/add` | Adiciona um produto ao carrinho |
-| PUT | `/cart/me/item/{item_id}` | Atualiza a quantidade de um item |
-| DELETE | `/cart/me/item/{item_id}` | Remove um item do carrinho |
-| DELETE | `/cart/me` | Limpa o carrinho inteiro |
+| GET | `/cart/me` | Returns the account's cart items |
+| POST | `/cart/me/add` | Adds a product to the cart |
+| PUT | `/cart/me/item/{item_id}` | Updates an item's quantity |
+| DELETE | `/cart/me/item/{item_id}` | Removes an item from the cart |
+| DELETE | `/cart/me` | Clears the entire cart |
 
-**Pedidos e conta** (requer header `Authorization: Bearer {token}`)
+**Orders and account** (requires `Authorization: Bearer {token}` header)
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |--------|------|-----------|
-| POST | `/orders` | Finaliza a compra a partir do carrinho da conta (preço calculado no servidor) |
-| GET | `/account` | Retorna dados da conta, preferências salvas e histórico de pedidos |
-| PUT | `/account` | Atualiza endereço, telefone ou forma de pagamento preferida |
+| POST | `/orders` | Completes the purchase from the account's cart (price calculated on the server) |
+| GET | `/account` | Returns account data, saved preferences, and order history |
+| PUT | `/account` | Updates address, phone, or preferred payment method |
 
-Documentação interativa disponível em `/docs` quando o servidor está rodando.
+Interactive documentation is available at `/docs` while the server is running.
 
-## ⚙️ Como rodar o projeto localmente
+## ⚙️ Running the project locally
 
-### Pré-requisitos
-- [Node.js](https://nodejs.org/) instalado
-- [Python 3.10+](https://www.python.org/downloads/) instalado
+### Prerequisites
+- [Node.js](https://nodejs.org/) installed
+- [Python 3.10+](https://www.python.org/downloads/) installed
 
-### 1. Clone o repositório
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/marinsnanadev/ecommerce.git
 cd ecommerce
 ```
 
-### 2. Rodando o back-end
+### 2. Running the back-end
 
 ```bash
 cd backend
 python -m venv venv
 
-# Ativar o ambiente virtual
+# Activate the virtual environment
 # Windows:
 venv\Scripts\Activate.ps1
 # Mac/Linux:
@@ -139,54 +139,54 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-# Popular o banco de dados com os dados iniciais
+# Seed the database with initial data
 python -m app.seed
 
-# Iniciar o servidor
+# Start the server
 uvicorn app.main:app --reload
 ```
 
-O back-end estará disponível em `http://127.0.0.1:8000`.
+The back-end will be available at `http://127.0.0.1:8000`.
 
-> 💡 Copie `backend/.env.example` para `backend/.env` para definir `SECRET_KEY` (usada para assinar os tokens de login) e `CORS_ORIGINS` (URLs do front-end autorizadas a acessar a API). Em desenvolvimento local, os valores padrão já funcionam sem precisar criar esse arquivo.
+> 💡 Copy `backend/.env.example` to `backend/.env` to set `SECRET_KEY` (used to sign login tokens) and `CORS_ORIGINS` (front-end URLs authorized to access the API). In local development, the default values already work without needing to create this file.
 
-#### Rodando os testes do back-end
+#### Running the back-end tests
 
 ```bash
 cd backend
-pip install -r requirements.txt  # já inclui pytest e httpx
+pip install -r requirements.txt  # already includes pytest and httpx
 pytest
 ```
 
-### 3. Rodando o front-end
+### 3. Running the front-end
 
-Em outro terminal, na raiz do projeto:
+In another terminal, from the project root:
 
 ```bash
 npm install
 npm start
 ```
 
-O front-end estará disponível em `http://localhost:3000` e já aponta por padrão para a API em `http://127.0.0.1:8000`.
+The front-end will be available at `http://localhost:3000` and points by default to the API at `http://127.0.0.1:8000`.
 
-> 💡 Se sua API estiver em outro endereço (ex: produção), copie `.env.example` para `.env` e ajuste a variável `REACT_APP_API_URL`.
+> 💡 If your API is at a different address (e.g. production), copy `.env.example` to `.env` and adjust the `REACT_APP_API_URL` variable.
 
-#### Rodando os testes do front-end
+#### Running the front-end tests
 
 ```bash
 npm test
 ```
 
-> ⚠️ Os dois servidores (back-end e front-end) precisam estar rodando simultaneamente para a aplicação funcionar completamente.
+> ⚠️ Both servers (back-end and front-end) need to be running at the same time for the application to work fully.
 
-## 🗺️ Roadmap / Próximos passos
+## 🗺️ Roadmap / Next steps
 
-- Painel administrativo para gestão de produtos
-- Recuperação de senha por email
-- Deploy do back-end (Render/Railway) e front-end (Vercel/Netlify)
+- Admin panel for product management
+- Password recovery by email
+- Deploy the back-end (Render/Railway) and front-end (Vercel/Netlify)
 
-## 👩‍💻 Autora
+## 👩‍💻 Author
 
-Desenvolvido por **Nana** — Estudante de Engenharia de Software, com experiência prévia como desenvolvedora full stack.
+Developed by **Nana** — Software Engineering student, with prior experience as a full-stack developer.
 
 [GitHub](https://github.com/marinsnanadev)

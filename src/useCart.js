@@ -36,7 +36,7 @@ export function useCart(token) {
       const data = isAuthenticated ? await fetchMyCart(token) : await fetchCart(sessionId);
       setCartItems(mapCartResponse(data));
     } catch (err) {
-      console.warn('Erro ao carregar carrinho:', err);
+      console.warn('Error loading cart:', err);
       setCartItems([]);
     }
   };
@@ -55,7 +55,7 @@ export function useCart(token) {
       }
       await loadCart();
     } catch (err) {
-      console.error('Erro ao adicionar ao carrinho:', err);
+      console.error('Error adding to cart:', err);
     }
 
     const toastId = `${product.name}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -87,7 +87,7 @@ export function useCart(token) {
       }
       await loadCart();
     } catch (err) {
-      console.error('Erro ao atualizar quantidade:', err);
+      console.error('Error updating quantity:', err);
     }
   };
 
@@ -100,7 +100,7 @@ export function useCart(token) {
       }
       await loadCart();
     } catch (err) {
-      console.error('Erro ao limpar carrinho:', err);
+      console.error('Error clearing cart:', err);
     }
   };
 

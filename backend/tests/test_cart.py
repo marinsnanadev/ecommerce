@@ -42,14 +42,14 @@ def test_update_nonexistent_item_returns_404(client):
 
 
 def test_update_cart_item_from_another_session_is_blocked(client, seeded_product):
-    """Regressão do fix de segurança: session-B não pode alterar item da session-A."""
+    """Security-fix regression test: session-B cannot modify session-A's item."""
     client.post("/cart/session-A/add", json={"product_id": "red-suit", "quantity": 1})
     item_id = client.get("/cart/session-A").json()[0]["item_id"]
 
     response = client.put(f"/cart/session-B/item/{item_id}", json={"quantity": 99})
     assert response.status_code == 404
 
-    # item da session-A precisa continuar intacto
+    # session-A's item must remain intact
     cart = client.get("/cart/session-A").json()
     assert cart[0]["quantity"] == 1
 
@@ -64,14 +64,14 @@ def test_remove_cart_item_in_own_session_succeeds(client, seeded_product):
 
 
 def test_remove_cart_item_from_another_session_is_blocked(client, seeded_product):
-    """Regressão do fix de segurança: session-B não pode remover item da session-A."""
+    """Security-fix regression test: session-B cannot remove session-A's item."""
     client.post("/cart/session-A/add", json={"product_id": "red-suit", "quantity": 1})
     item_id = client.get("/cart/session-A").json()[0]["item_id"]
 
     response = client.delete(f"/cart/session-B/item/{item_id}")
-    assert response.status_code == 200  # delete é idempotente, não vaza existência
+    assert response.status_code == 200  # delete is idempotent, does not leak existence
 
-    # item da session-A precisa continuar lá
+    # session-A's item must still be there
     cart = client.get("/cart/session-A").json()
     assert len(cart) == 1
 

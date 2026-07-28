@@ -16,8 +16,8 @@ from sqlalchemy.orm import Session
 from . import models
 from .database import get_db
 
-# Em produção, defina SECRET_KEY como variável de ambiente (backend/.env).
-# Esse valor padrão só serve para desenvolvimento local.
+# In production, set SECRET_KEY as an environment variable (backend/.env).
+# This default value is for local development only.
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 dias

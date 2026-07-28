@@ -131,7 +131,7 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
                 }
             })
             .catch(() => {
-                // sem defaults salvos ainda, sem problema — segue com o formulário em branco
+                // no saved defaults yet, no problem — continue with a blank form
             });
     }, [token]);
 

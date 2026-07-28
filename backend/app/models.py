@@ -40,8 +40,8 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # Preenchidos/atualizados automaticamente a cada pedido finalizado,
-    # e editáveis diretamente na página de conta do cliente.
+    # Filled in/updated automatically on each completed order,
+    # and editable directly on the customer's account page.
     default_phone = Column(String, nullable=True)
     default_address_street = Column(String, nullable=True)
     default_address_city_state = Column(String, nullable=True)
@@ -106,8 +106,8 @@ class OrderItem(Base):
     order_id = Column(Integer, ForeignKey("orders.id"))
     product_id = Column(String, ForeignKey("products.id"), nullable=True)
 
-    # Snapshot no momento da compra: preserva o pedido histórico mesmo que
-    # o produto original mude de preço, nome ou seja removido depois.
+    # Snapshot at the time of purchase: preserves the historical order even if
+    # the original product later changes price, name, or is removed.
     product_name = Column(String)
     product_price = Column(Float)
     product_image = Column(String)

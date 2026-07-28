@@ -20,9 +20,9 @@ load_dotenv()
 
 app = FastAPI()
 
-# Em produção, defina CORS_ORIGINS no backend/.env com a(s) URL(s) real(is)
-# do front-end, separadas por vírgula (ex: "https://meusite.com,https://www.meusite.com").
-# Em desenvolvimento, já cai no localhost:3000 padrão do Create React App.
+# In production, set CORS_ORIGINS in backend/.env with the real front-end
+# URL(s), comma-separated (e.g. "https://mysite.com,https://www.mysite.com").
+# In development, it falls back to the default localhost:3000 from Create React App.
 _default_origins = "http://localhost:3000"
 allowed_origins = [
     origin.strip()
@@ -55,7 +55,7 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-    session_id: Optional[str] = None  # carrinho de convidado a mesclar, se houver
+    session_id: Optional[str] = None  # guest cart to merge, if any
 
 
 class UserOut(BaseModel):
@@ -110,7 +110,7 @@ def get_products_by_category(category_name: str, db: Session = Depends(get_db)):
 
 
 # ---------------------------------------------------------------------------
-# Helpers de carrinho (compartilhados entre rotas de convidado e autenticadas)
+# Cart helpers (shared between guest and authenticated routes)
 # ---------------------------------------------------------------------------
 
 def get_or_create_cart(db: Session, session_id: str):
@@ -190,7 +190,7 @@ def _merge_guest_cart_into_user_cart(db: Session, guest_cart: models.Cart, user_
 
 
 # ---------------------------------------------------------------------------
-# Helpers de pedido/conta
+# Order/account helpers
 # ---------------------------------------------------------------------------
 
 # Mantidos em sincronia com as mesmas constantes no front-end (CheckoutPage.js).
@@ -269,13 +269,13 @@ def read_current_user(current_user: models.User = Depends(get_current_user)):
 
 
 # ---------------------------------------------------------------------------
-# Cart (usuário autenticado)
+# Cart (authenticated user)
 #
-# IMPORTANTE: essas rotas com path fixo ("/cart/me...") precisam ser
-# registradas ANTES das rotas dinâmicas "/cart/{session_id}..." logo abaixo.
-# O FastAPI casa rotas na ordem em que são declaradas, então se a rota
-# dinâmica viesse primeiro, "/cart/me" seria capturada por ela com
-# session_id="me" e a rota autenticada nunca seria alcançada.
+# IMPORTANT: these fixed-path routes ("/cart/me...") must be registered
+# BEFORE the dynamic routes ("/cart/{session_id}...") declared below.
+# FastAPI matches routes in the order they're declared, so if the
+# dynamic route came first, "/cart/me" would be captured by it with
+# session_id="me" and the authenticated route would never be reached.
 # ---------------------------------------------------------------------------
 
 @app.get("/cart/me")
@@ -357,8 +357,8 @@ def place_order(
     if not cart.items:
         raise HTTPException(status_code=400, detail="Cart is empty")
 
-    # Preço/itens vêm do carrinho já salvo no servidor, nunca do que o
-    # cliente mandar no payload, evita que o total seja manipulado.
+    # Price/items come from the cart already saved on the server, never from
+    # what the client sends in the payload, preventing the total from being manipulated.
     subtotal = sum(item.product.price * item.quantity for item in cart.items)
     tax = round(subtotal * TAX_RATE, 2)
     total = subtotal + tax + SHIPPING_COST
@@ -378,7 +378,7 @@ def place_order(
         total=total,
     )
     db.add(order)
-    db.flush()  # gera order.id antes de criar os itens
+    db.flush()  # generates order.id before creating the items
 
     for cart_item in cart.items:
         db.add(models.OrderItem(
@@ -390,8 +390,8 @@ def place_order(
             quantity=cart_item.quantity,
         ))
 
-    # Guarda como "preferência" pra pré-preencher o próximo checkout
-    # e aparecer na página de conta.
+    # Stored as a "preference" to pre-fill the next checkout
+    # and to show up on the account page.
     current_user.default_phone = payload.phone
     current_user.default_address_street = payload.address_street
     current_user.default_address_city_state = payload.address_city_state

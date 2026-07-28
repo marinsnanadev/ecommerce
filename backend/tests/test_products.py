@@ -23,7 +23,7 @@ def test_get_products_returns_seeded_product_with_numeric_price(client, seeded_p
     data = response.json()
     assert len(data) == 1
     assert data[0]["id"] == "red-suit"
-    # price precisa ser numérico (Float), não string com "$" (ver item 5)
+    # price must be numeric (Float), not a string with "$" (see item 5)
     assert isinstance(data[0]["price"], (int, float))
     assert data[0]["price"] == 220.0
 

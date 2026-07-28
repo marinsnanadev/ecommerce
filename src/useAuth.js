@@ -16,7 +16,7 @@ export function useAuth() {
     fetchCurrentUser(token)
       .then((currentUser) => setUser(currentUser))
       .catch(() => {
-        // token expirado/inválido: limpa a sessão local
+        // expired/invalid token: clear the local session
         localStorage.removeItem(TOKEN_STORAGE_KEY);
         setToken(null);
         setUser(null);

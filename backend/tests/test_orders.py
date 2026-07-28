@@ -1,4 +1,4 @@
-def register_user(client, email="user@example.com", password="senha123", name="Test User"):
+def register_user(client, email="user@example.com", password="password123", name="Test User"):
     response = client.post(
         "/auth/register",
         json={"name": name, "email": email, "password": password},
@@ -44,16 +44,16 @@ def test_place_order_computes_totals_from_server_side_cart(client, seeded_produc
 
     assert len(order["items"]) == 1
     assert order["items"][0]["quantity"] == 2
-    assert order["subtotal"] == 440.0  # 220 * 2, calculado no servidor
+    assert order["subtotal"] == 440.0  # 220 * 2, calculated on the server
     assert order["tax"] == round(440.0 * 0.08, 2)
     assert order["shipping"] == 12.0
     assert order["total"] == order["subtotal"] + order["tax"] + order["shipping"]
 
 
 def test_place_order_ignores_client_submitted_prices(client, seeded_product):
-    """Regressão de segurança: o total do pedido nunca deve confiar em
-    valores enviados pelo cliente, só no que está salvo no carrinho do
-    servidor. O schema CheckoutInfo nem aceita itens/preços no payload."""
+    """Security regression test: the order total must never trust
+    values sent by the client, only what's saved in the server's
+    cart. The CheckoutInfo schema doesn't even accept items/prices in the payload."""
     data = register_user(client)
     headers = auth_headers(data["access_token"])
     client.post("/cart/me/add", json={"product_id": "red-suit", "quantity": 1}, headers=headers)
@@ -65,7 +65,7 @@ def test_place_order_ignores_client_submitted_prices(client, seeded_product):
     response = client.post("/orders", json=tampered_payload, headers=headers)
     assert response.status_code == 200
     order = response.json()
-    assert order["subtotal"] == 220.0  # preço real do produto, não o forjado
+    assert order["subtotal"] == 220.0  # real product price, not the forged one
 
 
 def test_place_order_clears_the_cart(client, seeded_product):
@@ -142,5 +142,5 @@ def test_update_account_only_changes_provided_fields(client):
     assert response.status_code == 200
     body = response.json()
     assert body["default_address_zip"] == "22000-000"
-    assert body["name"] == "Test User"  # não enviado, deve permanecer igual
+    assert body["name"] == "Test User"  # not submitted, must remain unchanged
     assert body["email"] == "user@example.com"

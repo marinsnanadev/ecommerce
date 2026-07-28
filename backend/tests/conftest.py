@@ -16,7 +16,7 @@ from app.models import Category, Product
 
 @pytest.fixture()
 def db_session():
-    """Cria um banco SQLite em memória, isolado para cada teste."""
+    """Creates an in-memory SQLite database, isolated for each test."""
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -35,7 +35,7 @@ def db_session():
 
 @pytest.fixture()
 def client(db_session):
-    """TestClient da API com o banco em memória injetado no lugar do banco real."""
+    """API TestClient with the in-memory database injected in place of the real one."""
 
     def override_get_db():
         yield db_session
@@ -48,7 +48,7 @@ def client(db_session):
 
 @pytest.fixture()
 def seeded_product(db_session):
-    """Popula o banco de teste com uma categoria e um produto básicos."""
+    """Populates the test database with a basic category and product."""
     category = Category(name="Suits", description="Tailored pieces", accent="Essentials", image="suit.jpg")
     db_session.add(category)
     db_session.flush()
