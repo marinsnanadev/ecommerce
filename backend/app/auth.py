@@ -69,3 +69,19 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
+
+
+def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+    db: Session = Depends(get_db),
+):
+    """Same as get_current_user, but returns None instead of raising when no
+    (or an invalid) token is present. Used by routes that serve both signed-in
+    and guest users, like checkout."""
+    if credentials is None:
+        return None
+    try:
+        user_id = decode_access_token(credentials.credentials)
+    except HTTPException:
+        return None
+    return db.query(models.User).filter(models.User.id == user_id).first()

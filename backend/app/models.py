@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -71,16 +71,34 @@ class CartItem(Base):
     product_id = Column(String, ForeignKey("products.id"))
     quantity = Column(Integer, default=1)
 
+    # Price captured when the item was added/updated in the cart. Used at
+    # checkout only to detect drift against the product's current price —
+    # the amount actually charged always comes from Product.price, never
+    # from this snapshot.
+    price_snapshot = Column(Float, nullable=True)
+
     cart = relationship("Cart", back_populates="items")
     product = relationship("Product")
 
 
 class Order(Base):
     __tablename__ = "orders"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_order_user_idempotency_key"),
+        UniqueConstraint("session_id", "idempotency_key", name="uq_order_session_idempotency_key"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # Nullable: a guest checkout has no user_id, only the session_id its cart
+    # was tracked under. Every order has exactly one of the two set.
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    session_id = Column(String, nullable=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    # Set from the "Idempotency-Key" request header when the client sends
+    # one. Unique per user: a retried request with the same key returns the
+    # original order instead of creating a duplicate one.
+    idempotency_key = Column(String, nullable=True, index=True)
 
     name = Column(String)
     email = Column(String)

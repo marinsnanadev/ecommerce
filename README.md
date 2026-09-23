@@ -143,7 +143,9 @@ pip install -r requirements.txt
 python -m app.seed
 
 # Start the server
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload 
+# OR
+python -m uvicorn app.main:app --reload
 ```
 
 The back-end will be available at `http://127.0.0.1:8000`.

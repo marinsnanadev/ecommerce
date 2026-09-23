@@ -1,9 +1,11 @@
+import logging
 import os
 from typing import Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 
@@ -14,9 +16,19 @@ from .auth import (
     verify_password,
     create_access_token,
     get_current_user,
+    get_current_user_optional,
 )
 
 load_dotenv()
+
+# Structured-ish logging for the checkout flow: one line per key event, with
+# order/user/cart ids as fields instead of buried in free text, so it's easy
+# to grep/aggregate in production log tooling.
+logging.basicConfig(
+    level=os.environ.get("LOG_LEVEL", "INFO"),
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+logger = logging.getLogger("ecommerce.checkout")
 
 app = FastAPI()
 
@@ -78,6 +90,13 @@ class CheckoutInfo(BaseModel):
     address_city_state: Optional[str] = None
     address_zip: Optional[str] = None
     payment_method: str
+    # Required for guest checkout (no auth token): identifies which guest
+    # cart, tracked by session_id, to check out. Ignored for signed-in users.
+    session_id: Optional[str] = None
+    # When the client already showed the customer a price-change warning
+    # (see PRICE_CHANGED below) and the customer chose to proceed, resend
+    # the same request with this set to True to charge the current price.
+    confirm_price_changes: bool = False
 
 
 class AccountUpdate(BaseModel):
@@ -156,6 +175,10 @@ def _serialize_cart(cart: models.Cart):
 
 
 def _add_item_to_cart(db: Session, cart: models.Cart, product_id: str, quantity: int):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     existing_item = db.query(models.CartItem).filter(
         models.CartItem.cart_id == cart.id,
         models.CartItem.product_id == product_id
@@ -163,8 +186,14 @@ def _add_item_to_cart(db: Session, cart: models.Cart, product_id: str, quantity:
 
     if existing_item:
         existing_item.quantity += quantity
+        existing_item.price_snapshot = product.price
     else:
-        db.add(models.CartItem(cart_id=cart.id, product_id=product_id, quantity=quantity))
+        db.add(models.CartItem(
+            cart_id=cart.id,
+            product_id=product_id,
+            quantity=quantity,
+            price_snapshot=product.price,
+        ))
 
     db.commit()
 
@@ -351,11 +380,83 @@ def clear_my_cart(db: Session = Depends(get_db), current_user: models.User = Dep
 def place_order(
     payload: CheckoutInfo,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+    idempotency_key: Optional[str] = Header(None, alias="Idempotency-Key"),
 ):
-    cart = get_or_create_user_cart(db, current_user.id)
+    if current_user:
+        owner_desc = f"user_id={current_user.id}"
+        cart = get_or_create_user_cart(db, current_user.id)
+    else:
+        # Guest checkout: no auth token, so the cart is identified by the
+        # session_id the front-end has been using for this guest all along.
+        if not payload.session_id:
+            raise HTTPException(status_code=400, detail="session_id is required for guest checkout")
+        owner_desc = f"session_id={payload.session_id}"
+        cart = get_or_create_cart(db, payload.session_id)
+
+    logger.info("checkout.start %s idempotency_key=%s", owner_desc, idempotency_key)
+
+    def _find_existing_order():
+        query = db.query(models.Order).filter(models.Order.idempotency_key == idempotency_key)
+        if current_user:
+            query = query.filter(models.Order.user_id == current_user.id)
+        else:
+            query = query.filter(models.Order.session_id == payload.session_id)
+        return query.first()
+
+    # Idempotent replay: if the client already sent this exact key (e.g. a
+    # retried request after a timeout, or a double click), return the order
+    # that was already created instead of placing a second one.
+    if idempotency_key:
+        existing_order = _find_existing_order()
+        if existing_order:
+            logger.info(
+                "checkout.idempotent_replay %s order_id=%s idempotency_key=%s",
+                owner_desc, existing_order.id, idempotency_key,
+            )
+            return _serialize_order(existing_order)
+
     if not cart.items:
         raise HTTPException(status_code=400, detail="Cart is empty")
+
+    # A product may have been deleted from the catalog after being added to
+    # the cart. Fail with a clear, actionable error instead of crashing on
+    # item.product being None further down.
+    missing_product_ids = [item.product_id for item in cart.items if item.product is None]
+    if missing_product_ids:
+        logger.warning("checkout.product_removed %s product_ids=%s", owner_desc, missing_product_ids)
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "code": "PRODUCT_REMOVED",
+                "message": "One or more items in your cart are no longer available. Please remove them to continue.",
+                "product_ids": missing_product_ids,
+            },
+        )
+
+    # A product's price may have changed since it was added to the cart.
+    # Surface this explicitly rather than silently charging a different
+    # amount than what the customer last saw.
+    if not payload.confirm_price_changes:
+        price_changes = [
+            {
+                "product_id": item.product_id,
+                "old_price": item.price_snapshot,
+                "new_price": item.product.price,
+            }
+            for item in cart.items
+            if item.price_snapshot is not None and item.price_snapshot != item.product.price
+        ]
+        if price_changes:
+            logger.warning("checkout.price_changed %s changes=%s", owner_desc, price_changes)
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "code": "PRICE_CHANGED",
+                    "message": "The price of one or more items changed. Review and confirm to continue.",
+                    "changes": price_changes,
+                },
+            )
 
     # Price/items come from the cart already saved on the server, never from
     # what the client sends in the payload, preventing the total from being manipulated.
@@ -364,7 +465,9 @@ def place_order(
     total = subtotal + tax + SHIPPING_COST
 
     order = models.Order(
-        user_id=current_user.id,
+        user_id=current_user.id if current_user else None,
+        session_id=payload.session_id if not current_user else None,
+        idempotency_key=idempotency_key,
         name=payload.name,
         email=payload.email,
         phone=payload.phone,
@@ -390,19 +493,40 @@ def place_order(
             quantity=cart_item.quantity,
         ))
 
-    # Stored as a "preference" to pre-fill the next checkout
-    # and to show up on the account page.
-    current_user.default_phone = payload.phone
-    current_user.default_address_street = payload.address_street
-    current_user.default_address_city_state = payload.address_city_state
-    current_user.default_address_zip = payload.address_zip
-    current_user.default_payment_method = payload.payment_method
+    if current_user:
+        # Stored as a "preference" to pre-fill the next checkout
+        # and to show up on the account page. Guests have no account to save this to.
+        current_user.default_phone = payload.phone
+        current_user.default_address_street = payload.address_street
+        current_user.default_address_city_state = payload.address_city_state
+        current_user.default_address_zip = payload.address_zip
+        current_user.default_payment_method = payload.payment_method
 
     for item in list(cart.items):
         db.delete(item)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # Two concurrent requests raced past the earlier idempotency check
+        # with the same key; the unique constraint caught the duplicate.
+        # Roll back this attempt and hand back the order the other request
+        # already created.
+        db.rollback()
+        winner = _find_existing_order()
+        if winner:
+            logger.info(
+                "checkout.idempotent_race_resolved %s order_id=%s idempotency_key=%s",
+                owner_desc, winner.id, idempotency_key,
+            )
+            return _serialize_order(winner)
+        raise
+
     db.refresh(order)
+    logger.info(
+        "checkout.success %s order_id=%s total=%.2f items=%d",
+        owner_desc, order.id, order.total, len(order.items),
+    )
     return _serialize_order(order)
 
 

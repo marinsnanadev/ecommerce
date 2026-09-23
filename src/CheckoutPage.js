@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Footer from './Footer';
 import { formatPrice } from './formatPrice';
 import { PAYMENT_METHODS } from './paymentMethods';
 import { fetchAccount } from './accountApi';
+import { generateIdempotencyKey } from './idempotency';
 import './Nav.css';
 import './CartPage.css';
 import './CheckoutPage.css';
@@ -56,7 +57,25 @@ function PaymentMethodSelector({ selectedId, onSelect }) {
     );
 }
 
-function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder, isSubmitting, error }) {
+function OrderSummary({
+    items,
+    subtotal,
+    tax,
+    shipping,
+    total,
+    onPlaceOrder,
+    isSubmitting,
+    error,
+    priceChanges,
+    onConfirmPriceChanges,
+    removedProductIds,
+    onBackToCart,
+}) {
+    const nameById = useMemo(
+        () => Object.fromEntries(items.map((item) => [item.id, item.name])),
+        [items]
+    );
+
     return (
         <aside className="checkout-summary-card">
             <h2>Order summary</h2>
@@ -93,9 +112,47 @@ function OrderSummary({ items, subtotal, tax, shipping, total, onPlaceOrder, isS
 
             {error && <p className="checkout-error">{error}</p>}
 
-            <button type="button" className="checkout-btn" onClick={onPlaceOrder} disabled={isSubmitting}>
-                {isSubmitting ? 'Placing order...' : 'Place order'}
-            </button>
+            {removedProductIds && (
+                <div className="checkout-warning-notice">
+                    <p>These items are no longer available and were removed from your bag:</p>
+                    <ul>
+                        {removedProductIds.map((id) => (
+                            <li key={id}>{nameById[id] || id}</li>
+                        ))}
+                    </ul>
+                    <button type="button" className="checkout-btn checkout-btn-secondary" onClick={onBackToCart}>
+                        Back to bag
+                    </button>
+                </div>
+            )}
+
+            {priceChanges && (
+                <div className="checkout-warning-notice">
+                    <p>The price changed for these items since you added them:</p>
+                    <ul>
+                        {priceChanges.map((change) => (
+                            <li key={change.product_id}>
+                                {nameById[change.product_id] || change.product_id}:{' '}
+                                {formatPrice(change.old_price)} → {formatPrice(change.new_price)}
+                            </li>
+                        ))}
+                    </ul>
+                    <button
+                        type="button"
+                        className="checkout-btn checkout-btn-secondary"
+                        onClick={onConfirmPriceChanges}
+                        disabled={isSubmitting}
+                    >
+                        Accept new prices and continue
+                    </button>
+                </div>
+            )}
+
+            {!priceChanges && !removedProductIds && (
+                <button type="button" className="checkout-btn" onClick={onPlaceOrder} disabled={isSubmitting}>
+                    {isSubmitting ? 'Placing order...' : 'Place order'}
+                </button>
+            )}
         </aside>
     );
 }
@@ -104,6 +161,14 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHODS[0].id);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [priceChanges, setPriceChanges] = useState(null);
+    const [removedProductIds, setRemovedProductIds] = useState(null);
+    // One key per checkout attempt: generated when the customer lands on this
+    // page and reused across retries of that same attempt (including the
+    // "accept new prices" resubmit), so a double-click or a network retry
+    // can't create two orders. A brand new attempt (new page mount) gets a
+    // brand new key.
+    const idempotencyKeyRef = useRef(generateIdempotencyKey());
     const [form, setForm] = useState({
         name: user?.name || '',
         email: user?.email || '',
@@ -146,13 +211,28 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
     const tax = Math.round(subtotal * TAX_RATE);
     const total = subtotal + tax + SHIPPING_COST;
 
-    const handlePlaceOrder = async () => {
+    const handlePlaceOrder = async (confirmPriceChanges = false) => {
         setError(null);
+        setPriceChanges(null);
+        setRemovedProductIds(null);
         setIsSubmitting(true);
         try {
-            await onPlaceOrder({ ...form, payment_method: selectedPaymentMethod });
+            await onPlaceOrder(
+                {
+                    ...form,
+                    payment_method: selectedPaymentMethod,
+                    ...(confirmPriceChanges ? { confirm_price_changes: true } : {}),
+                },
+                idempotencyKeyRef.current
+            );
         } catch (err) {
-            setError(err.message || 'Something went wrong. Please try again.');
+            if (err.code === 'PRICE_CHANGED') {
+                setPriceChanges(err.details.changes);
+            } else if (err.code === 'PRODUCT_REMOVED') {
+                setRemovedProductIds(err.details.product_ids);
+            } else {
+                setError(err.message || 'Something went wrong. Please try again.');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -254,9 +334,13 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
                         tax={tax}
                         shipping={SHIPPING_COST}
                         total={total}
-                        onPlaceOrder={handlePlaceOrder}
+                        onPlaceOrder={() => handlePlaceOrder(false)}
                         isSubmitting={isSubmitting}
                         error={error}
+                        priceChanges={priceChanges}
+                        onConfirmPriceChanges={() => handlePlaceOrder(true)}
+                        removedProductIds={removedProductIds}
+                        onBackToCart={onBackToCart}
                     />
                 </div>
             </main>

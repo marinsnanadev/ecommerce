@@ -87,13 +87,9 @@ function App() {
             setCurrentPage('home');
             setCheckoutComplete(false);
           }}
-          onPlaceOrder={async (checkoutInfo) => {
-            if (auth.isAuthenticated) {
-              await placeOrder(auth.token, checkoutInfo);
-              await reloadCart();
-            } else {
-              await clearCart();
-            }
+          onPlaceOrder={async (checkoutInfo, idempotencyKey) => {
+            await placeOrder(auth.token, checkoutInfo, sessionId, idempotencyKey);
+            await reloadCart();
             setCheckoutComplete(true);
             setContinueAsGuest(false);
             setCurrentPage('home');
