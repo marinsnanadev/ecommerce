@@ -513,7 +513,10 @@ def place_order(
         # Roll back this attempt and hand back the order the other request
         # already created.
         db.rollback()
-        winner = _find_existing_order()
+        # Only treat this as an idempotency-key race: without a key, this
+        # constraint can't be what raised, and matching by NULL key could
+        # otherwise return an unrelated earlier order as if it were this one.
+        winner = _find_existing_order() if idempotency_key else None
         if winner:
             logger.info(
                 "checkout.idempotent_race_resolved %s order_id=%s idempotency_key=%s",

@@ -168,7 +168,10 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
     // "accept new prices" resubmit), so a double-click or a network retry
     // can't create two orders. A brand new attempt (new page mount) gets a
     // brand new key.
-    const idempotencyKeyRef = useRef(generateIdempotencyKey());
+    const idempotencyKeyRef = useRef(null);
+    if (idempotencyKeyRef.current === null) {
+        idempotencyKeyRef.current = generateIdempotencyKey();
+    }
     const [form, setForm] = useState({
         name: user?.name || '',
         email: user?.email || '',

@@ -1,3 +1,7 @@
+import pytest
+from sqlalchemy.exc import IntegrityError
+
+
 def register_user(client, email="user@example.com", password="password123", name="Test User"):
     response = client.post(
         "/auth/register",
@@ -292,3 +296,36 @@ def test_guest_and_authenticated_orders_are_independent(client, seeded_product):
 
     account = client.get("/account", headers=headers).json()
     assert len(account["orders"]) == 1  # guest order not attributed to this user
+
+
+def test_unrelated_commit_failure_without_idempotency_key_is_not_swallowed(client, seeded_product, db_session):
+    """The IntegrityError fallback exists to resolve idempotency-key races.
+    Without a key, a commit failure can't be that race — it must propagate
+    instead of being mistaken for one and silently returning some unrelated
+    earlier order as if it were this request's result."""
+    data = register_user(client)
+    headers = auth_headers(data["access_token"])
+    client.post("/cart/me/add", json={"product_id": "red-suit", "quantity": 1}, headers=headers)
+
+    # An earlier order (no idempotency key) already exists for this user —
+    # this is the order that must NOT be returned below.
+    earlier = client.post("/orders", json=CHECKOUT_PAYLOAD, headers=headers)
+    assert earlier.status_code == 200, earlier.text
+
+    client.post("/cart/me/add", json={"product_id": "red-suit", "quantity": 1}, headers=headers)
+
+    original_commit = db_session.commit
+    call_count = {"n": 0}
+
+    def failing_commit():
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            raise IntegrityError("simulated", {}, Exception("unrelated constraint violation"))
+        return original_commit()
+
+    db_session.commit = failing_commit
+    try:
+        with pytest.raises(IntegrityError):
+            client.post("/orders", json=CHECKOUT_PAYLOAD, headers=headers)
+    finally:
+        db_session.commit = original_commit

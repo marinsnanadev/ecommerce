@@ -1,6 +1,6 @@
 # VIOLET — E-commerce Full Stack
 
-Full-stack fashion store with a React front-end and a Python (FastAPI) back-end, featuring persistent data in a SQL database, user authentication, a shopping cart, and a functional checkout flow.
+A full-stack fashion e-commerce application, combining a React front-end with a Python (FastAPI) back-end. The project persists its data in a relational database and implements user authentication, a persistent shopping cart, and a complete checkout flow supporting both registered and guest customers.
 
 ![status](https://img.shields.io/badge/status-in%20development-yellow)
 ![react](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
@@ -10,7 +10,7 @@ Full-stack fashion store with a React front-end and a Python (FastAPI) back-end,
 
 ---
 
-## 📸 Preview
+## Preview
 
 ### Home
 ![Home](docs/gifs/splash-and-homepage.gif)
@@ -23,22 +23,22 @@ Full-stack fashion store with a React front-end and a Python (FastAPI) back-end,
 
 ---
 
-## ✨ About the project
+## About the project
 
-VIOLET is a clothing and accessories store, initially built as a front-end-only project and evolved into a complete full-stack application. The goal was to move away from hardcoded, fictional data toward a real architecture, with:
+VIOLET began as a front-end-only prototype for a clothing and accessories store and has since evolved into a complete full-stack application. The objective was to move beyond hardcoded, fictional data toward a real, production-oriented architecture, including:
 
-- A custom REST API, built in Python
+- A custom REST API built in Python
 - A relational database persisting products, categories, users, carts, and orders
 - User authentication with encrypted passwords and JWT-based sessions
-- A complete checkout flow, with the option to check out as a guest or create an account
-- A React front-end consuming the data dynamically
+- A complete, idempotent checkout flow, supporting both guest checkout and authenticated accounts
+- A React front-end consuming this data dynamically
 
-## 🧱 Tech Stack
+## Technology Stack
 
 **Front-end**
 - React
 - Custom CSS (animations, scroll reveal, responsive design)
-- Tests with Jest + Testing Library
+- Tests with Jest and Testing Library
 
 **Back-end**
 - Python 3
@@ -46,25 +46,28 @@ VIOLET is a clothing and accessories store, initially built as a front-end-only 
 - SQLAlchemy (ORM)
 - SQLite (database)
 - Uvicorn (ASGI server)
-- JWT (authentication) + password hashing with PBKDF2
+- JWT authentication with PBKDF2 password hashing
 - Tests with pytest
 
-## 🚀 Features
+## Features
 
-- [x] Category and product listing pulled from the database
-- [x] Filters (New / Featured) and sorting by price
-- [x] Persistent shopping cart (survives page refresh), tied to a guest session
-- [x] Add, update quantity, and remove cart items via the API
-- [x] User registration and login (hashed password, JWT-based session)
-- [x] The guest cart is automatically merged into the account cart on login/registration
-- [x] Checkout with the choice to continue as a guest or sign in/create an account
-- [x] Order total calculated and persisted on the server (never trusts a price sent by the client)
-- [x] Customer account page: address, phone, and preferred payment method (editable) + order history
-- [x] Confirmation modal before logging out
-- [x] Auto-generated interactive API documentation (Swagger)
-- [x] Automated test suite on the back-end (pytest) and front-end (Jest)
+- Category and product listing pulled from the database
+- Filtering (New / Featured) and sorting by price
+- Persistent shopping cart (survives page refresh), tied to a guest session
+- Add, update quantity, and remove cart items via the API
+- User registration and login (hashed password, JWT-based session)
+- Automatic merge of the guest cart into the account cart on login/registration
+- Checkout supporting both guest customers and authenticated accounts, backed by a single order pipeline on the server
+- Idempotent order submission via an `Idempotency-Key` header, so a network retry or a duplicate click never creates two orders
+- Server-side validation at checkout: products removed from the catalog or price changes since the item was added to the cart are detected and surfaced explicitly, rather than silently charging a different amount
+- Order total calculated and persisted entirely on the server; client-submitted prices are never trusted
+- Structured logging across the checkout flow for observability
+- Customer account page: editable address, phone, and preferred payment method, plus order history
+- Confirmation modal before logging out
+- Auto-generated interactive API documentation (Swagger)
+- Automated test suite on both the back-end (pytest) and front-end (Jest)
 
-## 🔌 API Endpoints
+## API Endpoints
 
 **Products and categories**
 
@@ -102,17 +105,17 @@ VIOLET is a clothing and accessories store, initially built as a front-end-only 
 | DELETE | `/cart/me/item/{item_id}` | Removes an item from the cart |
 | DELETE | `/cart/me` | Clears the entire cart |
 
-**Orders and account** (requires `Authorization: Bearer {token}` header)
+**Orders and account**
 
 | Method | Route | Description |
 |--------|------|-----------|
-| POST | `/orders` | Completes the purchase from the account's cart (price calculated on the server) |
-| GET | `/account` | Returns account data, saved preferences, and order history |
-| PUT | `/account` | Updates address, phone, or preferred payment method |
+| POST | `/orders` | Completes the purchase. Works for an authenticated user (`Authorization` header) or a guest (`session_id` in the body); price is always calculated on the server. Accepts an optional `Idempotency-Key` header to safely retry a request. |
+| GET | `/account` | Returns account data, saved preferences, and order history (requires authentication) |
+| PUT | `/account` | Updates address, phone, or preferred payment method (requires authentication) |
 
 Interactive documentation is available at `/docs` while the server is running.
 
-## ⚙️ Running the project locally
+## Running the project locally
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) installed
@@ -143,14 +146,12 @@ pip install -r requirements.txt
 python -m app.seed
 
 # Start the server
-uvicorn app.main:app --reload 
-# OR
-python -m uvicorn app.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 The back-end will be available at `http://127.0.0.1:8000`.
 
-> 💡 Copy `backend/.env.example` to `backend/.env` to set `SECRET_KEY` (used to sign login tokens) and `CORS_ORIGINS` (front-end URLs authorized to access the API). In local development, the default values already work without needing to create this file.
+Note: copy `backend/.env.example` to `backend/.env` to set `SECRET_KEY` (used to sign login tokens) and `CORS_ORIGINS` (front-end URLs authorized to access the API). In local development, the default values already work without creating this file.
 
 #### Running the back-end tests
 
@@ -171,7 +172,7 @@ npm start
 
 The front-end will be available at `http://localhost:3000` and points by default to the API at `http://127.0.0.1:8000`.
 
-> 💡 If your API is at a different address (e.g. production), copy `.env.example` to `.env` and adjust the `REACT_APP_API_URL` variable.
+Note: if the API is hosted at a different address (e.g. production), copy `.env.example` to `.env` and adjust the `REACT_APP_API_URL` variable.
 
 #### Running the front-end tests
 
@@ -179,15 +180,18 @@ The front-end will be available at `http://localhost:3000` and points by default
 npm test
 ```
 
-> ⚠️ Both servers (back-end and front-end) need to be running at the same time for the application to work fully.
+Both servers (back-end and front-end) need to be running simultaneously for the application to work fully.
 
-## 🗺️ Roadmap / Next steps
+## Roadmap / Next steps
 
+- Introduce versioned database migrations (Alembic) instead of relying on schema creation at startup
+- Stock/quantity validation when adding or updating cart items
+- Checkout metrics and alerting, complementing the existing structured logs
 - Admin panel for product management
 - Password recovery by email
 - Deploy the back-end (Render/Railway) and front-end (Vercel/Netlify)
 
-## 👩‍💻 Author
+## Author
 
 Developed by **Nana** — Software Engineering student, with prior experience as a full-stack developer.
 
