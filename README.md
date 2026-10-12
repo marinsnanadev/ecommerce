@@ -4,7 +4,7 @@ A full-stack fashion e-commerce application, combining a React front-end with a 
 
 ![status](https://img.shields.io/badge/status-in%20development-yellow)
 ![react](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
-![python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
 ![fastapi](https://img.shields.io/badge/FastAPI-005571?logo=fastapi)
 ![sqlite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)
 
@@ -119,7 +119,7 @@ Interactive documentation is available at `/docs` while the server is running.
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) installed
-- [Python 3.10+](https://www.python.org/downloads/) installed
+- [Python 3.14](https://www.python.org/downloads/) installed
 
 ### 1. Clone the repository
 
