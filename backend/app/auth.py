@@ -18,7 +18,11 @@ from .database import get_db
 
 # In production, set SECRET_KEY as an environment variable (backend/.env).
 # This default value is for local development only.
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+DEV_SECRET_KEY = "dev-secret-key-change-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY", DEV_SECRET_KEY)
+
+if os.environ.get("APP_ENV") == "production" and SECRET_KEY == DEV_SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be set in production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 dias
 
