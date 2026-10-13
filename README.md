@@ -2,11 +2,15 @@
 
 A full-stack fashion e-commerce application, combining a React front-end with a Python (FastAPI) back-end. The project persists its data in a relational database and implements user authentication, a persistent shopping cart, and a complete checkout flow supporting both registered and guest customers.
 
+[![live demo](https://img.shields.io/badge/live%20demo-violet--henna.vercel.app-000000?logo=vercel&logoColor=white)](https://violet-henna.vercel.app/)
 ![status](https://img.shields.io/badge/status-in%20development-yellow)
 ![react](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
 ![fastapi](https://img.shields.io/badge/FastAPI-005571?logo=fastapi)
 ![sqlite](https://img.shields.io/badge/SQLite-07405E?logo=sqlite&logoColor=white)
+![postgres](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+
+**Live demo:** [violet-henna.vercel.app](https://violet-henna.vercel.app/)
 
 ---
 
@@ -37,17 +41,19 @@ VIOLET began as a front-end-only prototype for a clothing and accessories store 
 
 **Front-end**
 - React
-- Custom CSS (animations, scroll reveal, responsive design)
+- Custom CSS (animations, scroll reveal, responsive layout down to small mobile screens)
 - Tests with Jest and Testing Library
+- Deployed on Vercel
 
 **Back-end**
 - Python 3
 - FastAPI
 - SQLAlchemy (ORM)
-- SQLite (database)
+- SQLite (local development) and PostgreSQL (production), selected through the `DATABASE_URL` variable
 - Uvicorn (ASGI server)
 - JWT authentication with PBKDF2 password hashing
 - Tests with pytest
+- Deployed on Render
 
 ## Features
 
@@ -63,7 +69,10 @@ VIOLET began as a front-end-only prototype for a clothing and accessories store 
 - Order total calculated and persisted entirely on the server; client-submitted prices are never trusted
 - Structured logging across the checkout flow for observability
 - Customer account page: editable address, phone, and preferred payment method, plus order history
+- Checkout is blocked until the client information (name, email, phone) and a payment method are filled in, with the first missing field focused and a clear error message
+- Responsive layout across the header, shop, category, cart, checkout and footer, down to small mobile screens
 - Confirmation modal before logging out
+- Production safeguards: the API refuses to start without a custom `SECRET_KEY` when `APP_ENV=production`
 - Auto-generated interactive API documentation (Swagger)
 - Automated test suite on both the back-end (pytest) and front-end (Jest)
 
@@ -151,7 +160,14 @@ uvicorn app.main:app --reload
 
 The back-end will be available at `http://127.0.0.1:8000`.
 
-Note: copy `backend/.env.example` to `backend/.env` to set `SECRET_KEY` (used to sign login tokens) and `CORS_ORIGINS` (front-end URLs authorized to access the API). In local development, the default values already work without creating this file.
+Note: copy `backend/.env.example` to `backend/.env` to set the variables below. In local development, the defaults already work without creating this file.
+
+| Variable       | Description                                                                                              | Default                         |
+| -------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `SECRET_KEY`   | Key used to sign login tokens. **Required in production.**                                               | insecure development key        |
+| `APP_ENV`      | Set to `production` to make the API fail on startup if `SECRET_KEY` was not changed                      | unset                           |
+| `CORS_ORIGINS` | Front-end URLs allowed to call the API, comma-separated                                                  | `http://localhost:3000`         |
+| `DATABASE_URL` | SQLAlchemy connection string. Use a PostgreSQL URL in production                                         | `sqlite:///./shop.db`           |
 
 #### Running the back-end tests
 
@@ -184,12 +200,10 @@ Both servers (back-end and front-end) need to be running simultaneously for the 
 
 ## Roadmap / Next steps
 
-- Introduce versioned database migrations (Alembic) instead of relying on schema creation at startup
 - Stock/quantity validation when adding or updating cart items
 - Checkout metrics and alerting, complementing the existing structured logs
 - Admin panel for product management
 - Password recovery by email
-- Deploy the back-end (Render/Railway) and front-end (Vercel/Netlify)
 
 ## Author
 
