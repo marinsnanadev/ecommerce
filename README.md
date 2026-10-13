@@ -208,4 +208,4 @@ Both servers (back-end and front-end) need to be running simultaneously for the 
 
 Developed by **Nana** — Software Engineering student, with prior experience as a full-stack developer.
 
-[GitHub](https://github.com/marinsnanadev)
+[GitHub](https://github.com/marinsnanadev) [LinkeIn](https://www.linkedin.com/in/gianna-marins-734944234/)
