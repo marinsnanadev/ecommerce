@@ -170,3 +170,65 @@
     position: relative;
   }
 }
+
+@media (max-width: 380px) {
+  .site-nav {
+    gap: 0.5rem;
+    padding-right: 0.8rem;
+    padding-left: 0.8rem;
+  }
+
+  .nav-mark {
+    font-size: 1.15rem;
+    letter-spacing: 0.2em;
+  }
+
+  .nav-back-btn {
+    padding: 0.45rem 0.35rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-nav-home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "links links";
+    gap: 0.65rem 0.75rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .site-nav-home > .nav-mark {
+    grid-area: brand;
+    justify-self: start;
+    white-space: nowrap;
+  }
+
+  .site-nav-home > .nav-links {
+    grid-area: links;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+    min-width: 0;
+    font-size: 0.68rem;
+  }
+
+  .site-nav-home .nav-account {
+    gap: 0.45rem;
+    letter-spacing: 0.1em;
+  }
+
+  .site-nav-home .nav-link-btn,
+  .site-nav-home .nav-links a {
+    letter-spacing: 0.12em;
+    font-size: 0.68rem;
+  }
+
+  .site-nav-home > .nav-actions {
+    grid-area: actions;
+    justify-self: end;
+    flex-shrink: 0;
+  }
+}

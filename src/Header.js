@@ -5,7 +5,7 @@ import './Header.css';
 function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, blackDress, whiteSuit, user, onLogout, onOpenLogin, onOpenAccount }) {
   return (
     <>
-      <nav className="site-nav">
+      <nav className="site-nav site-nav-home">
         <span className="nav-mark">VIOLET</span>
         <div className="nav-links">
           <button type="button" className="nav-link-btn" onClick={onOpenShop}>

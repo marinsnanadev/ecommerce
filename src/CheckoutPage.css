@@ -208,10 +208,75 @@
   .checkout-grid {
     grid-template-columns: 1fr;
   }
+
+  .checkout-form-card,
+  .checkout-summary-card {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 640px) {
   .checkout-page {
-    padding: 1rem 1.2rem 2rem;
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .checkout-hero {
+    margin-bottom: 1.25rem;
+  }
+
+  .checkout-hero-copy h1 {
+    font-size: clamp(1.8rem, 8vw, 2.3rem);
+    line-height: 1.15;
+  }
+
+  .checkout-hero-copy > p:last-child {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .checkout-grid {
+    gap: 1rem;
+  }
+
+  .checkout-form-card,
+  .checkout-summary-card {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .form-section-title {
+    font-size: 1.4rem;
+  }
+
+  .checkout-payment-block h2,
+  .checkout-summary-card h2 {
+    font-size: 1.4rem;
+  }
+
+  .checkout-item-row {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .checkout-item-row > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .checkout-item-price {
+    flex-shrink: 0;
+  }
+
+  .checkout-page .summary-row {
+    gap: 1rem;
+    font-size: 0.98rem;
+  }
+
+  .checkout-page .checkout-btn {
+    width: 100%;
+  }
+
+  .payment-option-content {
+    min-width: 0;
   }
 }

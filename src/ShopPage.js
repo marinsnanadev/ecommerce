@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { imageMap } from './imageMap';
 import { API_BASE } from './apiConfig';
-import Reveal from './Reveal';
 import './Nav.css';
 import './ShopPage.css';
 
@@ -65,9 +64,9 @@ function ShopPage({ onBackToHome, onSelectCategory, cartItemsCount = 0, onOpenCa
           </p>
         </section>
 
-        <Reveal as="section" className="shop-grid">
-          {categories.map((category, index) => (
-            <Reveal key={category.name} as="article" className="shop-card" style={{ transitionDelay: `${index * 80}ms` }}>
+        <section className="shop-grid">
+          {categories.map((category) => (
+            <article key={category.name} className="shop-card">
               <div className="shop-card-image">
                 <img src={imageMap[category.image]} alt={category.name} />
               </div>
@@ -79,9 +78,9 @@ function ShopPage({ onBackToHome, onSelectCategory, cartItemsCount = 0, onOpenCa
                   View collection
                 </button>
               </div>
-            </Reveal>
+            </article>
           ))}
-        </Reveal>
+        </section>
       </main>
     </div>
   );

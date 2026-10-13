@@ -100,3 +100,51 @@
 .shop-card-link:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 900px) {
+  .shop-page {
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  .shop-card-image {
+    height: clamp(220px, 38vw, 300px);
+  }
+}
+
+@media (max-width: 600px) {
+  .shop-page {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .shop-hero {
+    margin-bottom: 1.4rem;
+  }
+
+  .shop-hero h1 {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+  }
+
+  .shop-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .shop-card {
+    min-width: 0;
+    padding: 0.8rem;
+    border-right: 0;
+    border-bottom: 1px solid rgba(81, 59, 156, 0.14);
+  }
+
+  .shop-card-image {
+    height: clamp(260px, 85vw, 390px);
+  }
+
+  .shop-card-content {
+    padding: 1rem 0.2rem 1.1rem;
+  }
+
+  .shop-card h3 {
+    font-size: 1.1rem;
+  }
+}

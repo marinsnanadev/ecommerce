@@ -132,3 +132,48 @@
   font-weight: 700;
   color: var(--ink);
 }
+
+@media (max-width: 800px) {
+  .category-page {
+    padding: 1.5rem 1.2rem 3rem;
+  }
+
+  .category-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .category-hero-card {
+    height: clamp(260px, 65vw, 420px);
+  }
+}
+
+@media (max-width: 600px) {
+  .category-page {
+    padding: 1.2rem 1rem 2.5rem;
+  }
+
+  .category-hero-copy h1 {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+  }
+
+  .category-toolbar {
+    align-items: stretch;
+  }
+
+  .sort-control {
+    justify-content: space-between;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .category-product-image {
+    height: clamp(300px, 105vw, 460px);
+  }
+
+  .category-product-content {
+    padding: 1rem;
+  }
+}

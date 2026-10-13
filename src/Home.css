@@ -95,9 +95,9 @@
   }
 
   .collection-card {
-    flex: 0 0 calc(25% - 0.94rem);
-    width: calc(25% - 0.94rem);
-    max-width: calc(25% - 0.94rem);
+    flex: 0 0 calc(50% - 0.625rem);
+    width: calc(50% - 0.625rem);
+    max-width: calc(50% - 0.625rem);
     min-height: 320px;
   }
 }
@@ -342,7 +342,54 @@
   }
 
   .product-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .hero-section {
+    padding: 2.5rem 1.2rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .brand-title {
+    font-size: clamp(2.5rem, 14vw, 4rem);
+    letter-spacing: 0.1em;
+    overflow-wrap: anywhere;
+  }
+
+  .section-heading h2 {
+    font-size: 1.65rem;
+  }
+
+  .collection-header {
+    align-items: flex-start;
+  }
+
+  .collection-card {
+    flex-basis: calc(50% - 0.625rem);
+    width: calc(50% - 0.625rem);
+    max-width: calc(50% - 0.625rem);
+    min-height: 0;
+    padding: 0.75rem;
+  }
+
+  .card-image {
+    height: clamp(150px, 50vw, 220px);
+  }
+
+  .collection-card p,
+  .product-meta p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .editorial-image {
+    height: clamp(220px, 70vw, 320px);
+  }
+
+  .product-image {
+    width: 76px;
+    height: 100px;
   }
 
   .product-index {
