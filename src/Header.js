@@ -56,7 +56,7 @@ function Header({ cartItemsCount, onOpenCart, onOpenShop, frontImageIndex, black
           <p className="eyebrow">Fashion house — FW26</p>
           <h1 className="brand-title">VIOLET</h1>
           <p className="hero-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Designed for the city after dark and the soft glow of morning light, our pieces balance sculpted silhouettes with effortless ease. Discover refined staples and statement layers made to move beautifully from day plans to evening moments.
           </p>
           <div className="hero-actions">
             <a href="#shop" className="primary-btn">

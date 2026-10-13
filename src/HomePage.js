@@ -147,9 +147,9 @@ function HomePage({ cartItemsCount, onOpenCart, onOpenShop, onSelectCategory, ad
             </div>
             <div className="editorial-copy">
               <p className="eyebrow">Why VIOLET</p>
-              <h2>&ldquo;Lorem ipsum dolor sit amet&rdquo;</h2>
+              <h2>&ldquo;Minimal layers, maximum presence&rdquo;</h2>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
+                Thoughtful silhouettes, tactile fabrics, and elevated essentials designed to bring polish to your everyday wardrobe.
               </p>
             </div>
           </div>
