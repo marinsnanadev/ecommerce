@@ -3,7 +3,6 @@
 A full-stack fashion e-commerce application, combining a React front-end with a Python (FastAPI) back-end. The project persists its data in a relational database and implements user authentication, a persistent shopping cart, and a complete checkout flow supporting both registered and guest customers.
 
 [![live demo](https://img.shields.io/badge/live%20demo-violet--henna.vercel.app-000000?logo=vercel&logoColor=white)](https://violet-henna.vercel.app/)
-![status](https://img.shields.io/badge/status-in%20development-yellow)
 ![react](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
 ![fastapi](https://img.shields.io/badge/FastAPI-005571?logo=fastapi)
