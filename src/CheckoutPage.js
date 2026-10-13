@@ -45,6 +45,7 @@ function PaymentMethodSelector({ selectedId, onSelect }) {
                             value={method.id}
                             checked={selectedId === method.id}
                             onChange={() => onSelect(method.id)}
+                            required
                         />
                         <div className="payment-option-content">
                             <img src={method.image} alt={method.label} className="payment-option-image" />
@@ -158,7 +159,7 @@ function OrderSummary({
 }
 
 function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user, token }) {
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_METHODS[0].id);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [priceChanges, setPriceChanges] = useState(null);
@@ -215,6 +216,25 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
     const total = subtotal + tax + SHIPPING_COST;
 
     const handlePlaceOrder = async (confirmPriceChanges = false) => {
+        const requiredClientFields = [
+            ['name', 'client-name'],
+            ['email', 'client-email'],
+            ['phone', 'client-phone'],
+        ];
+        const missingField = requiredClientFields.find(([field]) => !form[field].trim());
+
+        if (missingField) {
+            setError('Complete all client information fields before placing your order.');
+            document.getElementById(missingField[1])?.focus();
+            return;
+        }
+
+        if (!selectedPaymentMethod) {
+            setError('Choose a payment method before placing your order.');
+            document.querySelector('.payment-option input')?.focus();
+            return;
+        }
+
         setError(null);
         setPriceChanges(null);
         setRemovedProductIds(null);
@@ -290,6 +310,7 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
                                 placeholder="johnsmith@example.com"
                                 value={form.email}
                                 onChange={updateField('email')}
+                                required
                             />
                             <FormField
                                 id="client-phone"
@@ -298,6 +319,7 @@ function CheckoutPage({ items, cartItemsCount, onBackToCart, onPlaceOrder, user,
                                 placeholder="+1 (555) 123-4567"
                                 value={form.phone}
                                 onChange={updateField('phone')}
+                                required
                             />
                         </FormSection>
 
